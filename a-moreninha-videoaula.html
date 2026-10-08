@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Moreninha — videoaula ilustrada</title>
+<style>
+:root{
+  --bg:#f6efe2; --panel:#fffaf0; --ink:#2a2018; --muted:#74634f; --line:#e2d4bb; --accent:#b4531a; --soft:#f0e5d0;
+  --augusto:#2f6fdb; --carolina:#d9631e; --filipe:#2f9e5b; --leopoldo:#7a4fd1; --fabricio:#d23b3b; --ana:#0f8f8f;
+  --joaninha:#5f6f86; --quinquina:#8f6b00; --clementina:#d4408f; --gabriela:#9333a8; --violante:#6b7a1f;
+  --paula:#8b5e3c; --tobias:#334155; --rafael:#475569; --keblerc:#a16207; --menina:#d98a5b; --velho:#6b5b4b;
+  --batista:#b45309; --sepia:#efe0c2; --menino:#7c6a55; --amigo:#4b5563; --pai:#1e40af;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#16120e; --panel:#211b15; --ink:#f1e8d8; --muted:#b3a38c; --line:#3a2f24; --accent:#f0985b; --soft:#2b231b; --sepia:#3a2d1c; }
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+button,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* linha do tempo */
+.top{padding:10px 16px 4px;max-width:1232px;width:100%;margin:0 auto}
+.timeline{display:flex;gap:4px;align-items:stretch}
+.st{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 4px;text-align:center;opacity:.55;transition:.3s;line-height:1.15}
+.st .ic{display:block;font-size:18px}
+.st b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st small{display:block;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st.done{opacity:.85}
+.st.now{opacity:1;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset;background:var(--soft)}
+.st.past{border-style:dashed}
+.st.past.now{background:var(--sepia)}
+
+/* palco */
+.stage{flex:1;min-height:0;padding:6px 16px 8px;display:flex}
+.slide{width:100%;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;min-height:0;animation:in .45s ease both}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:2px 0 8px}
+.tag{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.when{font-size:13px;color:var(--muted)}
+h2{font:700 clamp(22px,3.2vw,34px)/1.1 Georgia,"Times New Roman",serif;margin:0;flex-basis:100%}
+.ribbon{background:#8a5a1a;color:#fff;font-size:12px;font-weight:700;border-radius:99px;padding:2px 10px}
+.ribbon.leg{background:#0f766e}
+.body{flex:1;min-height:0;display:grid;grid-template-columns:1.15fr 1fr;gap:16px;overflow:auto;padding-bottom:4px}
+.body.one{grid-template-columns:1fr}
+.scene,.fiche{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;min-height:0}
+.scene{display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start;align-items:flex-start}
+.slide.past .scene,.slide.past .body.one>.scene{background:linear-gradient(160deg,var(--sepia),var(--panel));border-color:#c9a86a}
+.slide.past .head .tag{color:#8a5a1a}
+.fiche{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:12px;background:var(--soft)}
+.row i{font-style:normal;font-size:20px;line-height:1.2}
+.row small{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.row p{margin:0;font-size:clamp(14px,1.45vw,18px)}
+.row.act{outline:2px solid var(--accent)}
+mark{background:color-mix(in srgb,var(--accent) 25%,transparent);color:inherit;padding:0 3px;border-radius:4px;font-weight:700}
+
+/* revelações */
+.rv{opacity:0;transform:translateY(10px) scale(.98);transition:opacity .5s,transform .5s;pointer-events:none}
+.rv.on{opacity:1;transform:none;pointer-events:auto}
+.static .rv{transition:none}
+
+/* personagens */
+.av{--c:#666;display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--c);color:#fff;font:700 21px/1 Georgia,serif;flex:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 28%,transparent)}
+.av.sm{width:34px;height:34px;font-size:16px}
+.pc{display:flex;gap:10px;align-items:center;border:2px solid color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--c) 9%,var(--panel));border-radius:14px;padding:7px 12px 7px 8px}
+.pc b{display:block;color:var(--c);font-size:16px}
+.pc small{color:var(--muted);font-size:12.5px;line-height:1.2;display:block}
+.pc.act,.say.act{animation:glow 1.4s ease-in-out infinite}
+.pc.act .av,.say.act .av{transform:scale(1.12)}
+@keyframes glow{50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 30%,transparent)}}
+.say{display:flex;gap:8px;align-items:flex-start;flex-basis:100%;--c:#666}
+.bub{border-left:5px solid var(--c);background:color-mix(in srgb,var(--c) 9%,var(--panel));border-radius:4px 14px 14px 4px;padding:5px 12px;font-size:clamp(14px,1.45vw,18px)}
+.bub b{color:var(--c);font-size:12px;display:block;text-transform:uppercase;letter-spacing:.05em}
+.bub q{font-style:italic;quotes:"“" "”"}
+.ob{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--soft);border-radius:14px;padding:8px 12px;min-width:84px;text-align:center}
+.ob .em{font-size:34px;line-height:1.1}
+.ob small{font-size:12.5px;line-height:1.2;color:var(--muted);max-width:130px}
+.ob.big .em{font-size:50px}
+.chip{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:clamp(13px,1.35vw,16px)}
+.chip.k{background:color-mix(in srgb,var(--accent) 18%,var(--panel));border-color:var(--accent);font-weight:700}
+.chip.no{text-decoration:line-through;opacity:.7}
+.big-emoji{font-size:clamp(40px,6vw,70px);flex-basis:100%;text-align:center;line-height:1}
+.note{flex-basis:100%;font-size:13px;color:var(--muted);margin:0}
+.arrow{align-self:center;font-size:26px;color:var(--muted)}
+.sep{flex-basis:100%;height:0}
+
+/* quadros especiais */
+.tree{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
+.lv{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.lbl{font-size:12px;color:var(--muted);flex-basis:100%;text-align:center;margin:0}
+.breves{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}
+.breve{border-radius:16px;border:2px solid var(--line);padding:10px;text-align:center;background:var(--soft)}
+.breve .sq{width:74px;height:74px;margin:0 auto 6px;border-radius:10px;display:grid;place-items:center;font-size:34px;border:2px solid rgba(0,0,0,.2);position:relative}
+.breve.w .sq{background:#fff}
+.breve.g .sq{background:#2e9d5b}
+.breve b{display:block}
+.breve small{display:block;color:var(--muted);font-size:13px}
+.dots{width:100%;display:flex;flex-direction:column;gap:8px}
+.three{display:grid;grid-template-columns:44px 1fr;gap:4px 10px;align-items:center;background:var(--soft);border-radius:12px;padding:8px 10px}
+.three .d{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:18px}
+.three p{margin:0;font-size:clamp(13.5px,1.4vw,17px)}
+.girls{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%}
+.girl{border:2px solid color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--c) 9%,var(--panel));border-radius:14px;padding:8px 10px;display:flex;gap:10px;align-items:center}
+.girl .em{font-size:30px}
+.girl b{color:var(--c);display:block}
+.girl small{font-size:13px;color:var(--muted);display:block;line-height:1.25}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;width:100%}
+.mood{width:100%;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.mood span{background:var(--soft);border-radius:99px;padding:2px 9px}
+
+/* legenda */
+.cap{min-height:0;max-width:1200px;width:100%;margin:0 auto;padding:0 16px}
+.cap p{margin:0 0 6px;padding:8px 14px;background:rgba(20,16,12,.88);color:#fff;border-radius:12px;font-size:clamp(14px,1.5vw,18px);text-align:center;display:none}
+body.caps .cap p{display:block}
+
+/* controles */
+.ctl{padding:8px 16px 12px;background:var(--panel);border-top:1px solid var(--line)}
+.ctl .in{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.prog{display:flex;gap:2px;height:12px}
+.prog button{flex:1;border:0;padding:0;border-radius:3px;background:var(--line);position:relative}
+.prog button.done{background:color-mix(in srgb,var(--accent) 60%,var(--line))}
+.prog button.now{background:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.btn{border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:8px 14px;min-width:46px;font-size:18px}
+.btn.main{background:var(--accent);color:#fff;border-color:var(--accent);min-width:110px;font-weight:700}
+.btn:hover{filter:brightness(.96)}
+.opt{display:flex;gap:6px;align-items:center;font-size:14px;color:var(--muted)}
+.opt select{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 6px;max-width:170px}
+.cnt{font-size:14px;color:var(--muted);min-width:120px;text-align:center}
+
+/* início */
+#start{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:9;padding:20px}
+#start .card{max-width:620px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+#start h1{font:700 clamp(30px,6vw,52px)/1.05 Georgia,serif;margin:0}
+#start p{margin:0;color:var(--muted)}
+#start .btn.main{font-size:22px;padding:12px 30px}
+#start ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;font-size:14px;color:var(--muted)}
+#warn{display:none;background:#fde7c8;color:#4a2b00;border-radius:10px;padding:8px 12px;font-size:14px}
+
+@media (max-width:760px){
+  .body{grid-template-columns:1fr}
+  .st small{display:none}
+  .st b{font-size:10.5px}
+  .opt.v{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .rv,.slide{transition:none;animation:none}
+  .pc.act,.say.act{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div id="start">
+  <div class="card">
+    <div style="font-size:54px">🦋</div>
+    <h1>A Moreninha</h1>
+    <p>Videoaula ilustrada · Joaquim Manuel de Macedo<br>Preparação para a prova de leitura · duração aproximada: <span id="mins">9</span> minutos (varia com a voz e a velocidade)</p>
+    <button class="btn main" id="go">▶ Começar</button>
+    <div id="warn"></div>
+    <ul><li>Espaço = iniciar/pausar</li><li>← → = voltar/avançar</li><li>R = repetir slide</li><li>C = legendas</li></ul>
+    <p style="font-size:13px">A narração usa a voz em português do seu navegador (use o Chrome ou o Edge, de preferência).</p>
+  </div>
+</div>
+
+<div class="top"><div class="timeline" id="timeline"></div></div>
+<div class="stage" id="stage"></div>
+<div class="cap"><p id="cap"></p></div>
+
+<div class="ctl"><div class="in">
+  <div class="prog" id="prog" aria-label="Slides"></div>
+  <div class="btns">
+    <button class="btn" id="prev" title="Slide anterior (←)" aria-label="Slide anterior">⏮</button>
+    <button class="btn" id="rep" title="Repetir este slide (R)" aria-label="Repetir slide">↺</button>
+    <button class="btn main" id="pp" aria-label="Iniciar ou pausar">▶ Iniciar</button>
+    <button class="btn" id="next" title="Próximo slide (→)" aria-label="Próximo slide">⏭</button>
+    <span class="cnt" id="cnt"></span>
+    <label class="opt">Velocidade
+      <select id="rate"><option value="0.85">0,85×</option><option value="1" selected>1×</option><option value="1.15">1,15×</option><option value="1.3">1,3×</option></select>
+    </label>
+    <label class="opt v">Voz <select id="voice"><option>automática</option></select></label>
+    <label class="opt"><input type="checkbox" id="caps"> Legendas</label>
+  </div>
+</div></div>
+
+<script>
+/* ===== Personagens ===== */
+const CH={
+  augusto:{n:'Augusto',i:'A'}, carolina:{n:'Carolina',i:'C'}, filipe:{n:'Filipe',i:'F'}, leopoldo:{n:'Leopoldo',i:'L'},
+  fabricio:{n:'Fabrício',i:'F'}, ana:{n:'Dona Ana',i:'A'}, joaninha:{n:'Joaninha',i:'J'}, quinquina:{n:'Quinquina',i:'Q'},
+  clementina:{n:'Clementina',i:'C'}, gabriela:{n:'Gabriela',i:'G'}, violante:{n:'Dona Violante',i:'V'}, paula:{n:'Paula',i:'P'},
+  tobias:{n:'Tobias',i:'T'}, rafael:{n:'Rafael',i:'R'}, keblerc:{n:'Keblerc',i:'K'}, menina:{n:'A menina',i:'?'},
+  velho:{n:'O velho',i:'V'}, batista:{n:'Batista',i:'B'},
+  menino:{n:'O menino',i:'M'}, amigo:{n:'Amigo da família',i:'?'}, pai:{n:'Pai de Augusto',i:'P'}
+};
+const AV=(k,c='')=>`<span class="av ${c}" style="--c:var(--${k})">${CH[k].i}</span>`;
+const PC=(k,sub,b=0,n)=>`<div class="pc rv" data-b="${b}" style="--c:var(--${k})">${AV(k)}<div><b>${n||CH[k].n}</b><small>${sub}</small></div></div>`;
+const SAY=(k,t,b=0,n)=>`<div class="say rv" data-b="${b}" style="--c:var(--${k})">${AV(k,'sm')}<div class="bub"><b>${n||CH[k].n}</b><q>${t}</q></div></div>`;
+const OB=(e,l,b=0,x='')=>`<div class="ob rv ${x}" data-b="${b}"><span class="em">${e}</span><small>${l}</small></div>`;
+const CP=(t,b=0,x='')=>`<span class="chip rv ${x}" data-b="${b}">${t}</span>`;
+const BIG=(e,b=0)=>`<div class="big-emoji rv" data-b="${b}">${e}</div>`;
+const NOTE=(t,b=0)=>`<p class="note rv" data-b="${b}">${t}</p>`;
+const FI=(a,b)=>{const L=[['👥','Quem'],['⚡','O quê'],['❓','Por quê'],['🔎','Pista para reconhecer']];
+  return `<div class="fiche">${L.map((l,i)=>`<div class="row rv" data-b="${b[i]}"><i>${l[0]}</i><div><small>${l[1]}</small><p>${a[i]}</p></div></div>`).join('')}</div>`;};
+
+/* ===== Linha do tempo ===== */
+const STAGES=[
+  {ic:'⏪',l:'Há 7 anos',s:'passado',p:1},
+  {ic:'📜',l:'Segunda',s:'a aposta'},
+  {ic:'✉️',l:'Sexta',s:'a carta'},
+  {ic:'🏝️',l:'Sábado',s:'na ilha'},
+  {ic:'🎉',l:'Domingo',s:'Sant’Ana'},
+  {ic:'🧵',l:'Semanas',s:'o amor cresce'},
+  {ic:'💍',l:'20 de agosto',s:'desfecho'}
+];
+
+/* ===== Slides ===== */
+const S=[];
+
+S.push({st:1,tag:'Cap. 1 · Aposta imprudente',when:'Segunda-feira · quarto de Leopoldo',title:'Quatro estudantes de Medicina',
+ scene:PC('filipe','6º ano · adora discursar',1)+PC('leopoldo','dono da casa · da roça · “M”',2)+PC('fabricio','o clássico · namora sem gastar',3)+PC('augusto','5º ano · o romântico inconstante',4)+
+   CP('“Carraspana!…” — gritam para calar Filipe',1,'k'),
+ fiche:FI(['Filipe, Leopoldo, Fabrício e Augusto','Conversam depois do jantar e zombam dos discursos de Filipe','Filipe vira orador depois de comer','Refrão <mark>“Carraspana!”</mark>'],[0,1,1,1]),
+ beats:[
+  `Segunda-feira, no quarto de Leopoldo, quatro estudantes de Medicina conversam.`,
+  `Filipe, do sexto ano, adora discursar; os outros gritam: carraspana!`,
+  `Leopoldo é o dono da casa, rapaz da roça e melhor amigo de Augusto.`,
+  `Fabrício é o clássico: quer namorar sem gastar.`,
+  `Augusto, do quinto ano, é o romântico que jura nunca amar alguém por muito tempo.`]});
+
+S.push({st:1,tag:'Cap. 1 · O convite',when:'Segunda-feira',title:'Santana na ilha da avó',
+ scene:OB('🏝️','ilha da avó',0,'big')+PC('ana','avó de Filipe · 60 anos',0)+
+   PC('joaninha','Joana · 17 anos · pálida · cabelos e olhos negros',1)+PC('quinquina','Joaquina · 16 · loura · olhos azuis',1)+PC('carolina','irmã de Filipe · 14 · moreninha',2)+
+   SAY('augusto','Moreninha? diabo!…',3),
+ fiche:FI(['Filipe convida; Augusto resiste','Convite para a véspera e o dia de Sant’Ana na ilha','“Minha avó chama-se Ana”; Augusto não resiste a moças','Augusto <mark>pula do canapé</mark> ao ouvir “pálida” e “moreninha”'],[0,0,3,3]),
+ beats:[
+  `Filipe convida os amigos para o dia de Santana, na ilha da avó, dona Ana, de sessenta anos.`,
+  `Lá estarão as primas: Joana, de dezessete anos, pálida, de cabelos negros; e Joaquina, de dezesseis, loura.`,
+  `E a irmã de Filipe, uma moreninha de quatorze.`,
+  `Augusto dizia que não iria, mas pula do canapé ao ouvir pálida e moreninha, e aceita.`]});
+
+S.push({st:1,tag:'Cap. 1 · A aposta',when:'Segunda-feira · oito da noite',title:'O termo da aposta',
+ scene:SAY('augusto','Juro que não. … Aposto que não.',0)+SAY('filipe','Aposto que sim.',0)+
+   OB('📜','prazo: <b>20 de agosto</b>',1,'big')+OB('❤️','amar <b>uma só mulher</b> por 15 dias ou mais',2,'big')+OB('📖','quem perde escreve <b>um romance</b>',2,'big')+
+   CP('testemunhas: Fabrício e Leopoldo',3,'k')+CP('almoço no Pharoux',3,'no')+CP('camarote para drama de João Caetano',3,'no'),
+ fiche:FI(['Filipe × Augusto · testemunhas Fabrício e Leopoldo','Se Augusto amar uma só mulher por 15 dias até 20 de agosto, escreve o romance; senão, escreve Filipe','Augusto jura que nunca pensa na mesma moça por 15 dias','Augusto amplia: vale <mark>qualquer mulher</mark>, não só as primas'],[0,2,0,1]),
+ beats:[
+  `Augusto jura que nunca pensa na mesma moça por quinze dias. Filipe aposta que ele vai se apaixonar.`,
+  `Augusto amplia a aposta: vale qualquer mulher, não só as primas.`,
+  `Se até vinte de agosto Augusto amar uma só mulher por quinze dias ou mais, escreverá um romance contando isso. Senão, escreve Filipe.`,
+  `As testemunhas são Fabrício e Leopoldo.`]});
+
+S.push({st:2,tag:'Cap. 2 · Fabrício em apuros',when:'Sexta-feira · dez da noite',title:'A carta de Fabrício',
+ scene:PC('rafael','criado de Augusto · leva a carta',0)+OB('✉️','carta de Fabrício',0)+PC('tobias','moleque de dona Joana · “pronto, lesto e agudo”',1)+
+   CP('teatro São Pedro · camarote nº 3',1)+CP('sinal: <b>lenço de seda verde</b>',1,'k')+
+   CP('4 cartas por semana',2)+CP('lenço da cor da fita dela',2)+CP('“amarela”',2)+CP('Augusto corteja Joana na ilha → Fabrício finge ciúmes',3,'k'),
+ fiche:FI(['Fabrício escreve a Augusto; Rafael entrega; Tobias leva recados','Pede que Augusto corteje Joana, para ele fingir ciúmes e terminar','Experimentou o amor romântico e saiu caro: cartas, teatro, Tobias pedindo dinheiro','Namoro nasceu no teatro com o <mark>lenço de seda verde</mark>'],[0,3,2,1]),
+ beats:[
+  `Na sexta à noite, o criado Rafael traz uma carta de Fabrício.`,
+  `Seguindo os conselhos de Augusto, ele namorou, no teatro, dona Joana, a pálida. O moleque Tobias leva os recados e pede dinheiro.`,
+  `Agora ela exige cartas e lenço da cor da sua fita. Ele a acha amarela e feia.`,
+  `Pede: corteje Joana na ilha, que eu finjo ciúmes e termino tudo.`]});
+
+S.push({st:3,tag:'Cap. 3 e 4 · Manhã de sábado',when:'Sábado · véspera de Sant’Ana',title:'Violante, Carolina e a guerra',
+ scene:PC('violante','velha feia · dois dentes · só fala de si',0)+SAY('augusto','Hemorróidas.',1)+SAY('violante','Este não nasceu para Medicina!',1)+
+   PC('carolina','irmã de Filipe · a Moreninha',2)+SAY('carolina','…até o dia de hoje ainda não me supus boneca.',2)+
+   PC('fabricio','pede ajuda a Augusto',3)+CP('“Guerra!” — primeiro ataque: no jantar',3,'k'),
+ fiche:FI(['Augusto e dona Violante; depois Carolina e Fabrício','Violante prende Augusto por horas; ele “diagnostica” hemorróidas','Vingança contra o tédio','<mark>“Este não nasceu para Medicina!”</mark>'],[0,1,1,1]),
+ beats:[
+  `No sábado, Augusto chega à ilha. Dona Violante, uma velha feia, o prende por horas.`,
+  `Para se vingar, ele diagnostica: hemorróidas. Ela responde: este não nasceu para Medicina!`,
+  `A avó manda Augusto sentar junto da neta, dona Carolina, a Moreninha. Ela retruca: não me suponho boneca!`,
+  `Fabrício pede ajuda para largar Joana. Augusto recusa, e os dois declaram guerra.`]});
+
+S.push({st:3,tag:'Quem é quem',when:'Relações da família e pares',title:'Família, primas e pares',flag:'one',
+ custom:`<div class="scene" style="justify-content:center"><div class="tree">
+   <div class="lv">${PC('ana','a avó · criou os netos órfãos',0)}</div><p class="lbl rv" data-b="0">avó de ↓</p>
+   <div class="lv">${PC('filipe','neto · irmão de Carolina',0)}${PC('carolina','neta · a Moreninha',0)}</div>
+   <p class="lbl rv" data-b="1">primas deles ↓</p>
+   <div class="lv">${PC('joaninha','Joana · 17 · pálida',1)}${PC('quinquina','Joaquina · 16 · loura',1)}</div>
+   <p class="lbl rv" data-b="2">amigas convidadas ↓</p>
+   <div class="lv">${PC('clementina','15 anos · maldosa · “epigrama interminável”',2)}${PC('gabriela','se acha bonita · muitos pretendentes',2)}</div>
+   <div class="lv">${CP('❤ Fabrício + Joaninha',3,'k')}${CP('❤ Filipe + Clementina (“C”)',3,'k')}${CP('❤ Augusto + Carolina (no fim)',3,'k')}</div>
+ </div></div>`,
+ beats:[
+  `Dona Ana é a avó que criou os netos órfãos, Filipe e Carolina, a Moreninha.`,
+  `Joaninha, a pálida, e Quinquina, a loura, são primas deles.`,
+  `Clementina, de quinze anos, é maldosa. Gabriela se acha bonita e coleciona pretendentes.`,
+  `Os pares: Fabrício e Joaninha; Filipe e Clementina; e, no fim, Augusto e Carolina.`]});
+
+S.push({st:3,tag:'Cap. 5 · Jantar conversado',when:'Sábado · vinte e seis pessoas à mesa',title:'O jantar',
+ scene:PC('quinquina','sonsa · meiga · à direita de Augusto',0)+PC('clementina','língua afiada',0)+PC('keblerc','alemão bebedor',0)+
+   SAY('clementina','Ela é travessa como o beija-flor, inocente como uma boneca, faceira como o pavão, e curiosa como… uma mulher.',1)+
+   SAY('carolina','…beba o seu copo de champagne ao alfabeto inteiro!',4)+
+   CP('brinde: Leopoldo “M” · Filipe “C” · Fabrício “J”',4,'k')+
+   `<div class="mood rv" data-b="2">Augusto sobre Carolina: <span>feia</span>→<span>espirituosa</span>→<span>bonitinha</span></div>`,
+ fiche:FI(['Augusto, Quinquina, Clementina, Carolina, Fabrício','Troca de farpas; Fabrício acusa Augusto de inconstante, que responde','Fabrício quer se vingar da recusa de ajuda','O <mark>brinde com iniciais</mark> e o “alfabeto inteiro”'],[0,3,3,4]),
+ beats:[
+  `No jantar, Augusto senta entre Quinquina, a sonsa, e Clementina, perto do alemão Keblerc, bebedor.`,
+  `Clementina diz que a Moreninha é travessa como o beija-flor, inocente como uma boneca, faceira como o pavão e curiosa como uma mulher.`,
+  `Carolina rebate e zomba da conversa de Augusto com Quinquina.`,
+  `Fabrício acusa Augusto de inconstante; ele diz amar todas, num só ideal.`,
+  `No brinde com iniciais, Leopoldo diz M, Filipe C e Fabrício J. Carolina manda Augusto beber ao alfabeto inteiro.`]});
+
+S.push({st:3,tag:'Cap. 6 · Augusto com seus amores',when:'Sábado à tarde · jardim e gruta',title:'Jardim e gruta',
+ scene:SAY('quinquina','Acácia! — “Sonhei com você!” · Amor-perfeito! — “Existo para ti só!”',0)+PC('carolina','recusa dez braços e corre sozinha',0)+
+   OB('🪨','gruta: banco de relva',1)+OB('🪣','bacia de pedra',1)+OB('🥛','copo de prata preso por corrente',1)+
+   PC('ana','ouve Augusto na gruta',1)+CP('ele ama uma menina sem nome e sem rosto',1,'k'),
+ fiche:FI(['Quinquina e Carolina no jardim; Augusto e dona Ana na gruta','Passeio; Augusto conta a história que escondeu dos amigos','Ninguém quis dar-lhe o braço; dona Ana o escuta','Gruta com <mark>copo de prata</mark> na fonte'],[0,1,1,1]),
+ beats:[
+  `No jardim, Quinquina brinca com o dicionário das flores; Carolina foge de todos os braços.`,
+  `Sem par, Augusto conta a dona Ana, na gruta, que ama uma menina cujo nome e rosto desconhece.`]});
+
+S.push({st:0,flag:'past',tag:'Cap. 7 · Os dois breves',when:'Passado · há sete anos · Augusto tinha 13',title:'A praia e a promessa',
+ scene:BIG('🏖️',0)+PC('augusto','13 anos',0)+PC('menina','7 anos · cabelos negros anelados',0)+OB('🐚','concha',1)+
+   SAY('menina','Ah!… eu ia morrer afogada!',1)+SAY('menina','Sou bonita, ou feia?…',2)+SAY('augusto','Tão bonita!',2)+
+   SAY('menina','…quando formos grandes, havemos de nos casar, sim?',2)+CP('primo Juca quebrou a boneca dela',2)+CP('“meu marido” · “minha mulher”',3,'k'),
+ fiche:FI(['Augusto (13) e uma menina (7), sem se dizerem os nomes','Brincam; ela pede casamento “quando formos grandes”','Ela prefere Augusto ao primo Juca, que lhe quebrou a boneca','<mark>“meu marido” / “minha mulher”</mark>; a concha'],[0,2,2,3]),
+ beats:[
+  `Passado: há sete anos, Augusto, com treze, brincava numa praia e viu uma menina de sete, de cabelos negros.`,
+  `Ela caiu tentando pegar uma concha e correu para os braços dele; ele trouxe a concha.`,
+  `Ela perguntou: sou bonita, ou feia? Ele: tão bonita! E ela decidiu: quando formos grandes, havemos de casar.`,
+  `Nem trocaram os nomes: eram meu marido e minha mulher.`]});
+
+S.push({st:0,flag:'past',tag:'Cap. 7 · Os dois breves',when:'Passado · há sete anos',title:'O velho e a profecia',
+ scene:SAY('menino','É meu pai que morre!',0)+PC('velho','~50 anos · morre de fome',0)+
+   OB('🪙','moeda de ouro (do padrinho dela)',1)+OB('💵','nota (da mãe de Augusto)',1)+
+   SAY('velho','Deus paga sempre a esmola que se dá ao pobre!',1),
+ fiche:FI(['Augusto, a menina, o velho moribundo, a mãe dele e os filhos','Os dois dão esmola; o velho vê os dois casados no futuro','O velho é pobre e morre de fome','Moeda de ouro + nota; <mark>profecia</mark>'],[0,1,0,1]),
+ beats:[
+  `Um menino pede ajuda: o pai está morrendo, de fome, numa casinha pobre.`,
+  `A menina dá uma moeda de ouro; Augusto, uma nota. O velho profetiza: Deus paga sempre a esmola, e vê os dois casados.`]});
+
+S.push({st:0,flag:'past',tag:'Cap. 7 · Os dois breves',when:'Passado · há sete anos',title:'Os dois breves',
+ scene:`<div class="breves">
+   <div class="breve w rv" data-b="0"><div class="sq">🤍</div><b>BREVE BRANCO</b><small>cor da candura da menina</small><small class="rv" data-b="1">contém o <b>camafeu</b> de Augusto</small><small class="rv" data-b="3">→ fica com a <b>menina</b></small></div>
+   <div class="breve g rv" data-b="0"><div class="sq">💚</div><b>BREVE VERDE</b><small>cor da esperança do menino</small><small class="rv" data-b="2">contém a <b>esmeralda</b> dela</small><small class="rv" data-b="3">→ fica com <b>Augusto</b></small></div>
+  </div>`+CP('mentira combinada: esmeralda perdida na praia · camafeu perdido nas pedras',3)+SAY('menina','Eu o guardarei!',4)+SAY('augusto','Eu o guardarei!…',4),
+ fiche:FI(['Augusto, a menina e o velho','O velho manda descoser dois breves e guardar neles as joias','Para que cada um guarde a lembrança e cumpra o casamento','<mark>Branco = camafeu = menina · Verde = esmeralda = Augusto</mark>'],[0,0,1,3]),
+ beats:[
+  `O velho manda descoser dois breves, amuletos de pano: um branco e um verde.`,
+  `Augusto dá um alfinete de camafeu, que vai no breve branco, cor da candura da menina.`,
+  `Ela dá um botão de esmeralda, que vai no breve verde, cor da esperança do menino.`,
+  `Trocam: ela fica com o branco, com o camafeu; ele, com o verde, com a esmeralda. Combinam mentir aos pais.`,
+  `Na despedida, cada um grita: eu o guardarei!`]});
+
+S.push({st:0,tag:'Cap. 8 · Augusto prosseguindo',when:'Passado · dos 13 aos 18 anos',title:'Depois do breve: três desilusões',flag:'past one',
+ custom:`<div class="scene"><div class="dots">
+   ${SAY('pai','…guarda melhor esse breve do que guardaste o camafeu.',0)}
+   <div class="three rv" data-b="1"><div class="d" style="background:#9a6a3a">🟤</div><p><b>Moreninha de 16</b> → casou com um velho de 60 · jura <mark>não amar morenas</mark></p></div>
+   <div class="three rv" data-b="1"><div class="d" style="background:#e58aa0">🌸</div><p><b>Coradinha</b> → “pobre menino com quem me divirto nas horas vagas” · jura <mark>não amar coradas</mark></p></div>
+   <div class="three rv" data-b="1"><div class="d" style="background:#c9c9d4">⚪</div><p><b>Pálida</b> → zomba dele e do primo <b>Jorge</b> · jura <mark>não amar pálidas</mark></p></div>
+   <div class="three rv" data-b="2"><div class="d" style="background:#f2c94c">🎶</div><p><b>Lundu</b> cantado por uma amiga → ele decide <mark>amar todas</mark> e guardar o breve para a mulher</p></div>
+  </div></div>`,
+ beats:[
+  `O pai manda guardar melhor o breve do que o camafeu. O velho morre, e Augusto nunca mais vê a menina.`,
+  `Aos dezoito, três moças zombam dele: a moreninha casa com um velho, a coradinha o chama de pobre menino, a pálida zomba dele e do primo Jorge. Ele jura contra cada cor.`,
+  `Um lundu o faz decidir: amará todas, e guardará o breve para a mulher.`]});
+
+S.push({st:3,flag:'leg',tag:'Cap. 9 · As lágrimas de amor',when:'Lenda contada por dona Ana, na gruta',title:'A lenda da fonte',
+ scene:PC('ana','narradora da lenda',0)+OB('🌿','Aí · jovem tamoia, 15 anos',0)+OB('🏹','Aoitin · caçador que não a olhava',0)+
+   OB('👁️','1ª gota · pálpebras<br><b>“Linda moça!”</b>',1)+OB('👂','2ª gota · ouvido<br><b>“Voz sonora!”</b>',1)+OB('💓','3ª gota · coração<br><b>“Sinto amar-te!”</b>',1)+
+   CP('virtude 1: quem bebe não sai da ilha sem amar alguém e volta',2,'k')+CP('virtude 2: algumas gotas revelam segredos de amor',2,'k'),
+ fiche:FI(['Aí e Aoitin; contada por dona Ana a Augusto','As lágrimas furam o rochedo, pingam nele dormindo e formam a fonte','Aí ama sem ser notada e chora e canta no rochedo','<mark>Três gotas</mark> e <mark>duas virtudes</mark> da fonte'],[0,1,0,2]),
+ beats:[
+  `Dona Ana conta a lenda da fonte: a tamoia Aí amava Aoitin, que nunca a olhava.`,
+  `As lágrimas furaram a pedra e pingaram nele dormindo: nos olhos, linda moça; no ouvido, voz sonora; no coração, sinto amar-te.`,
+  `Quem bebe da fonte não sai da ilha sem amar alguém, e algumas gotas revelam segredos de amor.`]});
+
+S.push({st:3,tag:'Cap. 7 a 10 · Na entrada da gruta',when:'Sábado à tarde',title:'Quem escutava',
+ scene:OB('👂','três vezes, ruído de alguém que corre',0)+PC('carolina','só ela aparece lá fora',0)+
+   OB('🗿','1ª: encostada à efígie da <b>Esperança</b>',1)+OB('🦋','2ª: atrás de uma <b>borboleta</b>',1)+OB('⛰️','3ª: indo ao <b>rochedo</b>',1)+
+   SAY('carolina','Eu tenho quinze anos / E sou morena e linda! / Mas amo e não me amam…',2),
+ fiche:FI(['Augusto, dona Ana e, lá fora, Carolina','Carolina escuta tudo e depois canta a balada de Aí no rochedo','Pista de que ela ouvia a história do breve','Balada: <mark>“Eu tenho quinze anos…”</mark>'],[0,1,1,2]),
+ beats:[
+  `Três vezes Augusto ouve alguém correndo à porta da gruta e só vê Carolina: junto à estátua da Esperança, atrás de uma borboleta, subindo ao rochedo.`,
+  `Dali, ela canta a balada de Aí: eu tenho quinze anos e sou morena e linda; mas amo e não me amam.`]});
+
+S.push({st:3,tag:'Cap. 11 · Travessuras de D. Carolina',when:'Sábado ao fim da tarde',title:'A rosa e o café',
+ scene:PC('carolina','dá a rosa e aperta os dedos',0)+PC('fabricio','pede a rosa · se fere',0)+PC('joaninha','belisca Fabrício de ciúme',0)+
+   SAY('fabricio','Ai! feri-me!… comprei uma rosa por algumas gotas de sangue.',0)+SAY('carolina','Maldita rosa! eu te amaldiçoo!',0)+
+   OB('☕','xícara tomba',1)+OB('🌳','raiz do chorão',1)+OB('👖','calças brancas de Augusto manchadas',1)+SAY('fabricio','Viva as calças de Augusto!',1),
+ fiche:FI(['Carolina, Fabrício, Joaninha; depois Augusto e Filipe','Rosa com espinhos; café derramado; queda na relva','Carolina provoca Fabrício, a vítima predileta','<mark>Rosa/espinhos</mark> e <mark>calças brancas</mark> com café'],[0,1,0,1]),
+ beats:[
+  `Carolina dá uma rosa a Fabrício, mas aperta-lhe os dedos nos espinhos; depois desfolha a flor, e Joaninha o belisca.`,
+  `Ao servir café, a xícara tomba, Fabrício cai sobre a raiz de um chorão, e o café mancha as calças brancas de Augusto.`]});
+
+S.push({st:3,tag:'Cap. 12 · Meia hora embaixo da cama',when:'Sábado à tarde · gabinete das moças',title:'Embaixo da cama',
+ scene:PC('filipe','empurra Augusto para o quarto das moças',0)+OB('🛏️','Augusto escondido, só de ceroulas',0,'big')+
+   `<div class="girls">
+     <div class="girl rv" data-b="1" style="--c:var(--clementina)"><span class="em">🪢</span><div><b>Clementina</b><small>trança de cabelo para Filipe, sob a <b>quarta roseira</b></small></div></div>
+     <div class="girl rv" data-b="2" style="--c:var(--gabriela)"><span class="em">💌</span><div><b>Gabriela</b><small>cartas trocadas: lacre azul (Joãozinho) · verde (Juca)</small></div></div>
+     <div class="girl rv" data-b="2" style="--c:var(--quinquina)"><span class="em">🎖️</span><div><b>Quinquina</b><small>desafia o tenente Gusmão (fita preta × branca)</small></div></div>
+     <div class="girl rv" data-b="2" style="--c:var(--joaninha)"><span class="em">💙</span><div><b>Joaninha</b><small>“o único de quem gosto”: Fabrício</small></div></div>
+   </div>`+SAY('carolina','(grito de dor lá fora)',3),
+ fiche:FI(['Augusto escondido; Joaninha, Quinquina, Clementina e Gabriela','Ele ouve os segredos delas e elas falam mal dele','Trocar as calças manchadas de café','<mark>Embaixo da cama</mark>; Augusto leva a carta do Joãozinho'],[0,2,0,3]),
+ beats:[
+  `Filipe manda Augusto trocar de roupa no quarto das moças. Quatro entram, e ele se esconde embaixo da cama.`,
+  `Ouve que Clementina deixará uma trança para Filipe embaixo da quarta roseira.`,
+  `Que Gabriela teve cartas trocadas por uma vendedora de empadas; que Quinquina desafia o tenente Gusmão; e que Joaninha só gosta de Fabrício.`,
+  `Ao ouvir o grito de Carolina, elas correm, e Augusto leva a carta que Gabriela deixou cair.`]});
+
+S.push({st:3,tag:'Cap. 13 · Os quatro em conferência',when:'Sábado à noite',title:'Paula bêbada',
+ scene:PC('keblerc','embebeda Paula com brindes',0)+PC('paula','ama de Carolina',0)+SAY('carolina','Oh! minha mãe!',0)+
+   CP('Violante: “São maleitas!”',1)+CP('Filipe: “baquites”',1)+CP('Fabrício: homeopatia',1)+CP('Leopoldo: magnetismo',1)+CP('Augusto: <b>escalda-pés</b>',1,'k'),
+ fiche:FI(['Paula, Keblerc, Carolina e os quatro estudantes','Paula cai; os rapazes fingem uma conferência médica','Era só uma bebedeira; os rapazes zombam das senhoras','O grito <mark>“Oh! minha mãe!”</mark>'],[0,1,0,0]),
+ beats:[
+  `Keblerc embebeda Paula, a ama de Carolina, que cai no chão. Carolina grita: oh, minha mãe!`,
+  `Os quatro estudantes fingem uma conferência médica, e Augusto receita um escalda-pés.`]});
+
+S.push({st:3,tag:'Cap. 14 · Pedilúvio sentimental',when:'Sábado à noite',title:'O pedilúvio',
+ scene:PC('carolina','banha os pés da ama',0)+PC('paula','a ama doente',0)+PC('augusto','assiste e toma o lugar',1)+
+   SAY('ana','Vá buscá-la… (manda Augusto)',0)+SAY('carolina','Ela me deu de mamar…',0)+OB('🪣','água quente · mãos roxas',0)+
+   SAY('augusto','Veja se eu sei dar um pedilúvio!',1),
+ fiche:FI(['Carolina, Paula, a escrava Tomásia e Augusto','Carolina banha os pés da ama; Augusto assume','Paula a amamentou; Augusto vê a bondade dela','Mãos roxas; <mark>a virada do amor de Augusto</mark>'],[0,1,0,1]),
+ beats:[
+  `Dona Ana manda Augusto buscar Carolina. Ele a encontra chorando, banhando os pés da ama em água quente, com as mãos já roxas.`,
+  `Augusto toma o lugar dela. Vendo tanta bondade, ele começa a se apaixonar.`]});
+
+S.push({st:4,tag:'Cap. 15 · Um dia em quatro palavras',when:'Domingo de Sant’Ana · aniversário da avó',title:'A rosa no júri',
+ scene:OB('💭','Augusto sonha com Carolina e beija… <b>Fabrício</b>',0)+OB('🌹','rosa de Augusto no cabelo de Quinquina',1)+PC('carolina','desfolha a rosa',1)+
+   `<div class="girls" style="grid-template-columns:repeat(3,1fr)">
+     <div class="breve rv" data-b="2"><b>Fabrício</b><small>presidente</small></div>
+     <div class="breve rv" data-b="2"><b>Leopoldo</b><small>acusa</small></div>
+     <div class="breve rv" data-b="2"><b>Filipe</b><small>defende</small></div></div>`+
+   CP('Clementina lê: indenizar o dono da rosa com <b>um beijo</b>',2,'k')+SAY('carolina','O senhor me perdoa?…',3),
+ fiche:FI(['Carolina, Quinquina, Augusto e o júri','O júri condena Carolina a pagar um beijo ao dono da rosa; ela pede perdão','Ciúme: Carolina desfolha a rosa de Quinquina','<mark>Júri</mark> e a sentença do beijo; Augusto beija-lhe a mão'],[0,3,1,2]),
+ beats:[
+  `No dia de Santana, aniversário da avó, Carolina, com ciúme, desfolha a rosa de Augusto que Quinquina usava no cabelo.`,
+  `O júri: Fabrício preside, Leopoldo acusa, Filipe defende e Clementina lê a sentença: Carolina pagará um beijo ao dono da rosa.`,
+  `Ela pede perdão; ele perdoa e beija-lhe a mão.`]});
+
+S.push({st:4,tag:'Cap. 16 · O sarau',when:'Domingo à noite · até as quatro da manhã',title:'O sarau e a carta anônima',
+ scene:PC('carolina','vestido branco simples · duas tranças',0)+CP('3ª contradança',1,'k')+PC('fabricio','reclama; ela mente para fugir dele',1)+
+   PC('clementina','escreve a carta (sorteada)',2)+OB('✉️','“Uma incógnita” → gruta ao amanhecer',2)+OB('😴','Carolina dorme no toucador; Clementina a beija',2),
+ fiche:FI(['Carolina, Augusto, Fabrício; as quatro moças','Carolina dança a 3ª contradança com Augusto; as moças convidam-no à gruta','Fabrício fala demais de amor; as moças foram enganadas pelas declarações','<mark>“Uma incógnita”</mark> e a 3ª contradança'],[0,2,1,2]),
+ beats:[
+  `No sarau, Carolina é a princesa da festa, de vestido branco simples e duas tranças.`,
+  `Augusto pede a terceira contradança. Fabrício reclama, mas ela alega que já prometera a Augusto, para fugir dele.`,
+  `Às quatro da manhã, quatro moças, ofendidas por Augusto ter se declarado a todas, escrevem uma carta anônima chamando-o à gruta.`]});
+
+S.push({st:4,tag:'Cap. 17 · Foram buscar lã e saíram tosquiadas',when:'Segunda, ao raiar do dia · gruta',title:'Augusto vira “adivinho”',
+ scene:OB('✉️','2ª carta no bolso: “é armadilha” — outra incógnita',0)+OB('🥛','bebe da fonte e finge consultar a fada',1)+
+   `<div class="girls">
+     <div class="girl rv" data-b="1" style="--c:var(--gabriela)"><span class="em">💌</span><div><b>Gabriela</b><small>cartas trocadas · escrito do Joãozinho</small></div></div>
+     <div class="girl rv" data-b="1" style="--c:var(--quinquina)"><span class="em">🌷</span><div><b>Quinquina</b><small>cravo com <b>sete botões</b> (Lúcio · Tobias · tenente Gusmão)</small></div></div>
+     <div class="girl rv" data-b="2" style="--c:var(--clementina)"><span class="em">🪢</span><div><b>Clementina</b><small>a trança de Filipe</small></div></div>
+     <div class="girl rv" data-b="2" style="--c:var(--joaninha)"><span class="em">📝</span><div><b>Joaninha</b><small>exigências a Fabrício; agradece e sai</small></div></div>
+   </div>`+SAY('augusto','Vieram buscar lã e saíram tosquiadas!',2),
+ fiche:FI(['Augusto contra as quatro moças','Usa o que ouviu embaixo da cama, fingindo adivinhar','Inverter a zombaria preparada contra ele','Senha <mark>“sete botões”</mark> e <mark>“lã… tosquiadas”</mark>'],[0,1,0,2]),
+ beats:[
+  `Augusto acha duas cartas no bolso; a segunda avisa que é uma armadilha.`,
+  `Na gruta, bebe da fonte e finge que uma fada lhe revela segredos: as cartas trocadas de Gabriela; o cravo de sete botões de Quinquina.`,
+  `A trança de Clementina; as exigências de Joaninha a Fabrício. Todas saem vencidas: vieram buscar lã e saíram tosquiadas!`]});
+
+S.push({st:4,tag:'Cap. 18 · Achou quem o tosquiasse',when:'Segunda, ao amanhecer · gruta',title:'A vez de Carolina',
+ scene:SAY('carolina','Agora, Sr. Augusto, é chegada a sua vez…',0)+
+   OB('🧚','a “fada” é a própria Carolina',1)+OB('🕰️','sabe: a menina de 7 anos, o velho, o camafeu',1)+OB('⚖️','prevê: ele perderá a aposta',1)+
+   SAY('augusto','…é só para dizer que eu amo…',2)+OB('🚪','ela foge por uma saída escondida no fundo da gruta',2),
+ fiche:FI(['Carolina e Augusto, sozinhos','Ela revela o passado dele e prevê que perderá a aposta; ele quase se declara, e ela some','Vingar as quatro moças e provocar Augusto','<mark>“É chegada a sua vez”</mark>; a “fada”'],[0,1,0,0]),
+ beats:[
+  `Surge Carolina: agora é a vez de Augusto! Ela revela o passado dele: a menina da praia, o camafeu e os três fracassos.`,
+  `Diz que a fada é ela mesma, e que ele vai perder a aposta. Quando ele tenta declarar-se, ela some por uma saída escondida.`]});
+
+S.push({st:5,tag:'Cap. 19 e 20 · Primeiro domingo',when:'Semanas depois da festa',title:'A bela mestra e o aprendiz',
+ scene:SAY('augusto','Eu amo! ardo! morro! (confessa a Leopoldo)',0)+PC('carolina','ama também e anda triste',0)+
+   OB('🧵','lição de <b>marcar</b> lenços',1)+OB('🪡','agulha, linha que rebenta, dedal',1)+
+   SAY('carolina','meu aprendiz',1)+SAY('augusto','minha bela mestra',1)+SAY('filipe','Fique-se aí, Sr. Hércules, aos pés da sua bela Onfale!',1),
+ fiche:FI(['Augusto, Carolina, Filipe, dona Ana, Leopoldo','Aulas de marcar; as mãos se encontram; promessa de puxão de orelha','Pretexto para ficarem juntos','<mark>“minha bela mestra”</mark> / <mark>“meu aprendiz”</mark>'],[0,1,1,1]),
+ beats:[
+  `Depois da festa, Augusto confessa a Leopoldo que está apaixonado. Carolina também, e anda triste.`,
+  `No primeiro domingo, ela o ensina a marcar lenços: bela mestra e aprendiz. As mãos se encontram, e Filipe o chama de Hércules aos pés de Onfale.`]});
+
+S.push({st:5,tag:'Cap. 21 · Segundo domingo',when:'Uma semana depois',title:'Lenço, bonecas e “talvez”',
+ scene:OB('🧣','lenço marcado: “Carolina” nos cantos · “Minha bela mestra” no centro',0)+PC('carolina','ciúme: rasga o lenço',0)+
+   OB('👵','encomendado a uma senhora muito idosa',1)+OB('🎎','passam o dia com as bonecas',1)+OB('🕊️','duas rolinhas se beijam',2)+
+   SAY('augusto','Elas se amam! … Serei eu?',2)+SAY('carolina','São felizes! … Talvez.',2),
+ fiche:FI(['Carolina, Augusto, dona Ana','Ela rasga o lenço e lhe dá outro; no jardim, ele pergunta se é ele o amado','Ciúme: achou que outra “mestra” bordou o lenço','<mark>“Serei eu?”</mark> — <mark>“Talvez.”</mark>'],[0,1,0,2]),
+ beats:[
+  `No segundo domingo, Augusto traz um lenço marcado com o nome Carolina. Ela julga que outra moça o fez, e o rasga de ciúme.`,
+  `Ele explica que mandou uma senhora idosa fazer; ela lhe dá um lenço seu, e passam o dia com as bonecas.`,
+  `No jardim, ele pergunta: serei eu? E ela responde: talvez.`]});
+
+S.push({st:5,tag:'Cap. 22 · Mau tempo',when:'Semana seguinte',title:'Trancado e doente',
+ scene:PC('augusto','trancado pelo pai para não ir à ilha',0)+SAY('augusto','Eu amo.',0,'Augusto ao médico')+
+   PC('carolina','espera no rochedo e se arrufa',1)+SAY('amigo','Esperança!',1)+SAY('carolina','Esperarei!',1),
+ fiche:FI(['Augusto, o pai, o médico; Carolina, dona Ana, um velho amigo','Augusto adoece; o pai cede; Carolina recebe um sinal de esperança','O pai quer apagar a paixão à força','<mark>“Esperança!” — “Esperarei!”</mark>'],[0,1,0,1]),
+ beats:[
+  `O pai tranca Augusto no quarto para impedi-lo de ir à ilha. Ele adoece e diz ao médico: eu amo.`,
+  `O pai cede. Carolina espera no rochedo; um amigo da família, ao partir, aponta o céu: esperança! E ela responde: esperarei!`]});
+
+S.push({st:6,tag:'Cap. 23 · A esmeralda e o camafeu',when:'Domingo seguinte · gruta',title:'O desfecho',
+ scene:PC('augusto','chega com o pai, que pede a mão dela',0)+PC('carolina','pede meia hora; resposta na gruta',0)+
+   SAY('carolina','Então, senhor, quem venceu: o homem ou a mulher?',1)+SAY('augusto','Foi a beleza.',1)+
+   OB('💚','Augusto mostra o breve verde',2)+OB('🤍','ela entrega o seu breve: “relíquia milagrosa”',2)+OB('📌','sai o <b>camafeu</b>!',2,'big')+
+   SAY('augusto','Achei minha mulher!',3)+SAY('carolina','…nós éramos conhecidos antigos.',3),
+ fiche:FI(['Augusto, Carolina, dona Ana, o pai de Augusto','Carolina era a menina da praia: o breve devolve o camafeu','Ela o testou por vaidade e para saber se ele cumpriria a promessa','<mark>Breve descosido → camafeu</mark>; “conhecidos antigos”'],[0,2,1,3]),
+ beats:[
+  `No domingo seguinte, Augusto chega com o pai, que pede a mão de Carolina. Ela dará a resposta na gruta.`,
+  `Lá, ela finge que ele deve cumprir a promessa da infância, e confessa que o seduziu por vaidade: quem venceu, o homem ou a mulher? Ele: a beleza.`,
+  `Desesperado, ele mostra o breve verde. Ela lhe dá seu breve branco, dizendo ter uma relíquia milagrosa. Ele descose… e sai o camafeu!`,
+  `Achei minha mulher! Carolina era a menina da praia: nós éramos conhecidos antigos.`]});
+
+S.push({st:6,tag:'Epílogo',when:'20 de agosto',title:'Um mês: a aposta',
+ scene:PC('filipe','planejou tudo com o pai de Augusto e o velho amigo',0)+PC('fabricio','chega',0)+PC('leopoldo','chega',0)+
+   OB('📆','dia <b>20 de agosto</b> · “um mês!”',1)+SAY('carolina','…finalmente está presa a borboleta.',1)+SAY('filipe','…Augusto deve-me um romance.',1)+SAY('augusto','Já está pronto. — “A Moreninha.”',1),
+ fiche:FI(['Filipe, Fabrício, Leopoldo, Augusto, Carolina, dona Ana','Augusto perdeu a aposta e entrega o romance','O casamento foi combinado antes; Augusto passou de “borboleta” a preso','O título do romance: <mark>A Moreninha</mark>'],[0,1,0,1]),
+ beats:[
+  `Chegam Filipe, Fabrício e Leopoldo. O casamento foi combinado por Filipe, pelo pai de Augusto e por um velho amigo de dona Ana.`,
+  `É vinte de agosto: um mês! Augusto perdeu a aposta, e deve um romance. O título: A Moreninha.`]});
+
+S.push({st:6,flag:'one',tag:'Revisão 1 · pessoas',when:'O que mais se confunde',title:'Quem é quem',
+ custom:`<div class="scene"><div class="girls" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
+   <div class="girl rv" data-b="0" style="--c:var(--joaninha)"><span class="em">🖤</span><div><b>Joaninha</b><small>pálida · 17 · namorada de Fabrício</small></div></div>
+   <div class="girl rv" data-b="0" style="--c:var(--quinquina)"><span class="em">💛</span><div><b>Quinquina</b><small>loura · 16 · tenente Gusmão · cravo</small></div></div>
+   <div class="girl rv" data-b="0" style="--c:var(--clementina)"><span class="em">🪢</span><div><b>Clementina</b><small>maldosa · 15 · ligada a Filipe · trança</small></div></div>
+   <div class="girl rv" data-b="0" style="--c:var(--gabriela)"><span class="em">💌</span><div><b>Gabriela</b><small>cartas trocadas · lacre azul e verde</small></div></div>
+   <div class="girl rv" data-b="1" style="--c:var(--paula)"><span class="em">🍷</span><div><b>Paula</b><small>ama de Carolina</small></div></div>
+   <div class="girl rv" data-b="1" style="--c:var(--tobias)"><span class="em">🎭</span><div><b>Tobias</b><small>moleque de dona Joana</small></div></div>
+   <div class="girl rv" data-b="1" style="--c:var(--rafael)"><span class="em">🍵</span><div><b>Rafael</b><small>criado de Augusto</small></div></div>
+   <div class="girl rv" data-b="1" style="--c:var(--keblerc)"><span class="em">🍺</span><div><b>Keblerc</b><small>alemão bebedor</small></div></div>
+   <div class="girl rv" data-b="2" style="--c:var(--leopoldo)"><span class="em">🏠</span><div><b>Leopoldo</b><small>dono da casa · amigo do coração · “M”</small></div></div>
+   <div class="girl rv" data-b="2" style="--c:var(--filipe)"><span class="em">🎤</span><div><b>Filipe</b><small>irmão de Carolina · autor da aposta · “C”</small></div></div>
+   <div class="girl rv" data-b="2" style="--c:var(--fabricio)"><span class="em">🥧</span><div><b>Fabrício</b><small>clássico · “J”</small></div></div>
+  </div></div>`,
+ beats:[
+  `Revisão. Joaninha é a pálida, de Fabrício. Quinquina, a loura, do tenente Gusmão. Clementina, a maldosa, de Filipe. Gabriela, das cartas trocadas.`,
+  `Paula é a ama de Carolina; Tobias, o moleque de Joana; Rafael, o criado de Augusto.`,
+  `Leopoldo é o dono da casa; Filipe, o irmão; Fabrício, o clássico.`]});
+
+S.push({st:6,flag:'one',tag:'Revisão 2 · objetos e frases',when:'Para a hora da prova',title:'Objetos, frases e lugares',
+ custom:`<div class="scene" style="align-content:flex-start">
+   ${OB('🤍','breve <b>branco</b> + camafeu → ficou com <b>Carolina</b>',0)}${OB('💚','breve <b>verde</b> + esmeralda → ficou com <b>Augusto</b>',0)}
+   ${OB('🌹','rosa de Fabrício: espinhos',1)}${OB('🌷','rosa de Quinquina: júri',1)}${OB('🥛','copo de prata na fonte da gruta',1)}${OB('🧣','lenço marcado: “bela mestra”',1)}
+   <span class="sep"></span>
+   ${CP('“Carraspana!”',2)}${CP('“Esperança!” — “Esperarei!”',2)}${CP('“sete botões”',2)}${CP('“lã… tosquiadas”',2)}${CP('“Serei eu?” — “Talvez.”',2)}${CP('“conhecidos antigos”',2)}
+   <span class="sep"></span>
+   ${CP('⏪ passado = a praia, 7 anos atrás',3,'k')}${CP('🧚 a “fada” da fonte = Carolina',3,'k')}${CP('📖 o romance: <b>A Moreninha</b>',3,'k')}
+  </div>`,
+ beats:[
+  `Objetos: o breve branco, com o camafeu, ficou com Carolina; o breve verde, com a esmeralda, ficou com Augusto.`,
+  `Rosas: a de Fabrício tinha espinhos; a de Quinquina foi a do júri.`,
+  `Frases: carraspana, esperarei, sete botões, tosquiadas e bela mestra.`,
+  `O passado é a praia, de sete anos atrás; e a fada da fonte era Carolina.`]});
+
+/* ===== Duração estimada ===== */
+const WPM=175;
+const words=S.reduce((a,s)=>a+s.beats.join(' ').split(/\s+/).length,0);
+document.getElementById('mins').textContent=Math.round(words/WPM);
+
+/* ===== Render ===== */
+const $=id=>document.getElementById(id);
+const stageEl=$('stage'), capEl=$('cap');
+let ended=false, cur=0, beat=-1, playing=false, token=0, started=false, rate=1, voice=null, silent=false, curUtter=null, timers=[];
+
+const tl=$('timeline');
+tl.innerHTML=STAGES.map((s,i)=>`<button class="st ${s.p?'past':''}" data-i="${i}" title="${s.l} · ${s.s}"><span class="ic">${s.ic}</span><b>${s.l}</b><small>${s.s}</small></button>`).join('');
+tl.addEventListener('click',e=>{const b=e.target.closest('.st'); if(!b)return; const i=S.findIndex(x=>x.st===+b.dataset.i); if(i>=0) go(i);});
+const prog=$('prog');
+prog.innerHTML=S.map((s,i)=>`<button data-i="${i}" title="${i+1}. ${s.title}" aria-label="Slide ${i+1}: ${s.title}"></button>`).join('');
+prog.addEventListener('click',e=>{const b=e.target.closest('button'); if(b) go(+b.dataset.i);});
+
+function slideHTML(s){
+  const flag=s.flag||'';
+  const past=flag.includes('past'), leg=flag.includes('leg'), one=flag.includes('one');
+  const body=s.custom?`<div class="body one">${s.custom}</div>`:`<div class="body"><div class="scene">${s.scene}</div>${s.fiche}</div>`;
+  return `<section class="slide ${past?'past':''}" aria-live="off">
+    <div class="head"><span class="tag">${s.tag}</span><span class="when">${s.when}</span>${past?'<span class="ribbon">⏪ PASSADO — contado por Augusto</span>':''}${leg?'<span class="ribbon leg">LENDA ANTIGA</span>':''}<h2>${s.title}</h2></div>${body}</section>`;
+}
+function setTimeline(){
+  const st=S[cur].st;
+  [...tl.children].forEach((b,i)=>{b.classList.toggle('now',i===st);b.classList.toggle('done',i<st||(i===0&&st>0));});
+  [...prog.children].forEach((b,i)=>{b.classList.toggle('now',i===cur);b.classList.toggle('done',i<cur);});
+  $('cnt').textContent=`Slide ${cur+1} de ${S.length}`;
+}
+function applyBeat(b,full){
+  const root=stageEl.firstElementChild; if(!root) return;
+  root.classList.toggle('static',!!full);
+  root.querySelectorAll('[data-b]').forEach(el=>{
+    const k=+el.dataset.b;
+    const was=el.classList.contains('on');
+    el.classList.toggle('on',full||k<=b);
+    if(!full&&k===b&&!was&&innerWidth<=760) el.scrollIntoView({block:'nearest',behavior:'smooth'});
+    el.classList.toggle('act',!full&&k===b&&(el.classList.contains('pc')||el.classList.contains('say')||el.classList.contains('row')));
+  });
+}
+function show(i,full){
+  cur=i; beat=-1;
+  stageEl.innerHTML=slideHTML(S[i]);
+  setTimeline();
+  applyBeat(full?99:-1,full);
+  capEl.textContent=full?S[i].beats.join(' '):'';
+}
+function clearTimers(){timers.forEach(clearTimeout);timers=[];}
+function stopSpeech(){token++;clearTimers();try{speechSynthesis.cancel();}catch(e){}}
+
+/* ===== Fala ===== */
+const hasTTS='speechSynthesis' in window;
+function pickVoice(){
+  if(!hasTTS) return;
+  const vs=speechSynthesis.getVoices().filter(v=>/^pt/i.test(v.lang));
+  const sel=$('voice'); const prev=sel.value;
+  sel.innerHTML='<option value="">automática</option>'+vs.map((v,i)=>`<option value="${v.name}">${v.name} (${v.lang})</option>`).join('');
+  if(prev) sel.value=prev;
+  const score=v=>(/pt[-_]BR/i.test(v.lang)?10:0)+(/natural|neural|online/i.test(v.name)?6:0)+(/google|francisca|maria|luciana|thalita|antonio|felipe/i.test(v.name)?3:0)+(v.localService?0:0);
+  voice=sel.value?vs.find(v=>v.name===sel.value):(vs.sort((a,b)=>score(b)-score(a))[0]||null);
+}
+if(hasTTS){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+$('voice').addEventListener('change',()=>{pickVoice(); if(playing){stopSpeech();runBeat();}});
+$('rate').addEventListener('change',e=>{rate=+e.target.value; if(playing){stopSpeech();runBeat();}});
+$('caps').addEventListener('change',e=>document.body.classList.toggle('caps',e.target.checked));
+
+function warn(msg){const w=$('warn'); w.textContent=msg; w.style.display='block';}
+
+function speak(text,done){
+  const tok=token;
+  const est=Math.max(2000,text.split(/\s+/).length/ (2.7*rate) *1000);
+  const timerOnly=()=>{timers.push(setTimeout(()=>{if(tok===token)done();},est));};
+  if(!hasTTS||silent){timerOnly();return;}
+  let started=false, finished=false;
+  const u=new SpeechSynthesisUtterance(text); curUtter=u;
+  u.lang='pt-BR'; u.rate=rate; if(voice){u.voice=voice;u.lang=voice.lang;}
+  const fin=()=>{if(finished||tok!==token)return;finished=true;clearTimers();done();};
+  u.onstart=()=>{started=true;};
+  u.onend=fin;
+  u.onerror=ev=>{ if(tok!==token) return; if(ev.error==='canceled'||ev.error==='interrupted') return; silent=true; showSilentNote(); if(!finished){finished=true;timerOnly();} };
+  try{speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){silent=true;timerOnly();return;}
+  // se o navegador não começar a falar, avança por tempo e avisa
+  timers.push(setTimeout(()=>{ if(tok===token&&!started&&!finished){silent=true;showSilentNote();finished=true;try{speechSynthesis.cancel();}catch(e){} timers.push(setTimeout(()=>{if(tok===token)done();},est));} },3500));
+  // segurança contra onend que não dispara
+  timers.push(setTimeout(fin,est*2.2+5000));
+}
+function showSilentNote(){
+  document.body.classList.add('caps'); $('caps').checked=true;
+  capEl.dataset.note='1';
+}
+
+function runBeat(){
+  clearTimers();
+  const tok=++token;
+  const s=S[cur];
+  if(beat<0) beat=0;
+  applyBeat(beat,false);
+  capEl.textContent=(silent?'🔇 Sem voz em português neste navegador — leia a legenda. ':'')+s.beats[beat];
+  speak(s.beats[beat],()=>{
+    if(tok!==token||!playing) return;
+    timers.push(setTimeout(()=>{
+      if(tok!==token||!playing) return;
+      if(beat<s.beats.length-1){beat++;runBeat();}
+      else if(cur<S.length-1){go(cur+1);}
+      else {playing=false;ended=true;stopSpeech();updatePP();capEl.textContent='Fim da videoaula. Use ↺ ou ⏮ para rever.';}
+    },350));
+  });
+}
+function go(i){
+  i=Math.max(0,Math.min(S.length-1,i)); ended=false;
+  stopSpeech();
+  if(playing){show(i,false);beat=0;runBeat();}
+  else show(i,true);
+  updatePP();
+}
+function play(){
+  started=true;
+  if(ended){ended=false;show(0,false);beat=0;}
+  else if(document.querySelector('.slide.static')||beat<0){show(cur,false);beat=0;}
+  playing=true; runBeat(); updatePP();
+}
+function pause(){playing=false;stopSpeech();updatePP();}
+function updatePP(){$('pp').textContent=playing?'⏸ Pausar':'▶ '+(!started?'Iniciar':ended?'Rever':'Continuar');}
+
+$('pp').onclick=()=>playing?pause():play();
+$('next').onclick=()=>go(cur+1);
+$('prev').onclick=()=>go(cur-1);
+$('rep').onclick=()=>{stopSpeech();ended=false;started=true;playing=true;show(cur,false);beat=0;runBeat();updatePP();};
+$('go').onclick=()=>{$('start').style.display='none';
+  // "desbloqueia" a fala com um gesto do usuário
+  if(hasTTS){try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}}
+  show(0,false);play();};
+document.addEventListener('keydown',e=>{
+  if($('start').style.display!=='none'){ if(e.key==='Enter'||e.key===' '){e.preventDefault();$('go').click();} return; }
+  if(e.target.matches('select,input')) return;
+  if(e.key===' '){e.preventDefault();$('pp').click();}
+  else if(e.key==='ArrowRight') go(cur+1);
+  else if(e.key==='ArrowLeft') go(cur-1);
+  else if(e.key==='r'||e.key==='R') $('rep').click();
+  else if(e.key==='c'||e.key==='C') {$('caps').checked=!$('caps').checked;$('caps').dispatchEvent(new Event('change'));}
+});
+document.addEventListener('visibilitychange',()=>{ if(document.hidden&&playing) pause(); });
+
+if(!hasTTS) warn('Seu navegador não tem síntese de voz: a apresentação avançará sozinha, com legendas.');
+show(0,true); updatePP();
+window.__S=S; window.__words=words;
+</script>
+</body>
+</html>
