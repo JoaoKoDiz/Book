@@ -111,9 +111,10 @@
   "source_frames": {
     "decoded_and_analysed_in_full_pass": 6727,
     "stored_in_search_database": 1777,
+    "compared_at_fine_level": 856,
     "re_decoded_for_fine_comparison": 650,
     "decoded_densely_in_refinement": 2337,
-    "total_source_frames_compared_in_detail": 26762
+    "dense_frame_target_pairs_scored": 26112
   },
   "unique_source_frames_selected": 187,
   "selected_source_span_s": [
@@ -242,17 +243,17 @@
     }
   ],
   "found_by": {
-    "database": 171,
-    "database (second-chance search)": 0,
-    "dense refinement (frame not in database)": 69
+    "database search": 171,
+    "second-chance search": 0,
+    "dense refinement": 69
   },
   "processing_time_s": {
-    "stage1_probe": 6.61,
-    "stage2_index": 7.33,
-    "reference": 0.32,
-    "stages4to7_match": 107.87,
-    "export": 10.32,
-    "total": 132.45
+    "stage1_probe": 6.12,
+    "stage2_index": 6.37,
+    "reference": 0.26,
+    "stages4to7_match": 96.07,
+    "export": 9.47,
+    "total": 118.3
   },
   "sampling_density": {
     "frames_decoded_and_analysed": 6727,
@@ -271,7 +272,7 @@
       "cut_window": 3,
       "dup_limit": 3
     },
-    "index_seconds": 7.326907157897949,
+    "index_seconds": 6.368762016296387,
     "kept_fraction_per_minute": {
       "min": 0.19444444444444445,
       "median": 0.259508289374529,
@@ -290,14 +291,14 @@
       "mean_total": 0.8423888683319092,
       "mean_best": 0.8424909114837646,
       "dense_candidates_added": 1057,
-      "seconds": 60.90532183647156
+      "seconds": 52.69775652885437
     },
     {
       "round": 2,
       "mean_total": 0.8423888683319092,
       "mean_best": 0.8424909114837646,
       "dense_candidates_added": 0,
-      "seconds": 3.203396797180176
+      "seconds": 2.8788998126983643
     }
   ],
   "verification": {
@@ -370,7 +371,7 @@
       "candidates": 300,
       "nms_window": 0.5,
       "max_per_window": 3,
-      "chunk": 8192
+      "chunk": 4096
     },
     "rerank": {
       "fine_topn": 24,

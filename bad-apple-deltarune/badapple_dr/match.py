@@ -18,6 +18,7 @@ Every round is checkpointed in work/match/.
 from __future__ import annotations
 
 import math
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -35,8 +36,8 @@ from .util import LOG, Progress, atomic_save_npz, atomic_write_json, fingerprint
 
 SCORE_KEYS = ("total", "composition", "structural", "semantic", "tone", "balance") + STRUCT_KEYS
 ORIGIN_DB, ORIGIN_SECOND, ORIGIN_DENSE = 0, 1, 2
-ORIGIN_NAMES = {ORIGIN_DB: "database", ORIGIN_SECOND: "database (second-chance search)",
-                ORIGIN_DENSE: "dense refinement (frame not in database)"}
+ORIGIN_NAMES = {ORIGIN_DB: "database search", ORIGIN_SECOND: "second-chance search",
+                ORIGIN_DENSE: "dense refinement"}
 
 
 def empty_pool() -> dict:
@@ -118,10 +119,11 @@ class Matcher:
         self.store = FrameStore(Path(work) / "fine_cache", self.fine_shape)
         self.workers = int(cfg["rerank"]["workers"])
         self.stats = read_json(self.dir / "stats.json", {}) or {}
-        for k in ("fine_fetched", "dense_frames_decoded", "dense_windows", "second_chance_targets",
-                  "dense_frames_scored", "fetch_missing"):
+        for k in ("fine_fetched_s5", "fine_compared_s5", "fine_fetched_s7", "fine_compared_s7", "dense_frames_decoded",
+                  "dense_windows", "second_chance_targets", "dense_frames_scored", "fetch_missing"):
             self.stats.setdefault(k, 0)
         self.dense_done: list[tuple[float, float]] = [tuple(x) for x in self.stats.get("dense_intervals", [])]
+        self.stage5_id = "unset"
         self.sem = None
         self.sem_status = "disabled"
         self.ref_emb = None
@@ -142,6 +144,18 @@ class Matcher:
     def _save_stats(self):
         self.stats["dense_intervals"] = [list(x) for x in self.dense_done]
         atomic_write_json(self.dir / "stats.json", self.stats)
+
+    def _reset_stats(self, all_stages: bool) -> None:
+        """Forget refinement bookkeeping (and counters) of a previous computation."""
+        keys = ["dense_frames_decoded", "dense_windows", "second_chance_targets", "dense_frames_scored",
+                "fine_fetched_s7", "fine_compared_s7"]
+        if all_stages:
+            keys += ["fine_fetched_s5", "fine_compared_s5", "fetch_missing"]
+        for k in keys:
+            self.stats[k] = 0
+        self.stats.pop("refine_history", None)
+        self.dense_done = []
+        self._save_stats()
 
     # ------------------------------------------------------------------------------------------
     # semantic
@@ -245,9 +259,11 @@ class Matcher:
     def _tol(self) -> float:
         return min(0.25 / self.fps, 0.004)
 
-    def ensure_fine(self, ns, pts) -> None:
+    def ensure_fine(self, ns, pts, stage: str = "s5") -> None:
+        self.stats[f"fine_compared_{stage}"] += len({int(n) for n in ns})  # scored at the fine level (cached or not)
         missing = [(int(n), float(p)) for n, p in zip(ns, pts) if int(n) not in self.store]
         if not missing:
+            self._save_stats()
             return
         prog = Progress(total=len(missing), desc="Re-decoding candidate frames (fine level)", unit="frames")
         for i in range(0, len(missing), 1500):
@@ -262,7 +278,7 @@ class Matcher:
                 else:
                     self.stats["fetch_missing"] += 1
             self.store.add_many(items)
-            self.stats["fine_fetched"] += len(items)
+            self.stats[f"fine_fetched_{stage}"] += len(items)
             self._save_stats()
         prog.close()
         if self.stats["fetch_missing"]:
@@ -310,9 +326,11 @@ class Matcher:
             d = np.load(path)
             if str(d["fp"]) == fp:
                 LOG.info("Stage 5: using saved detailed-comparison results.")
-                return unpack({k: d[k] for k in d.files if k != "fp"})
+                self.stage5_id = str(d["run_id"]) if "run_id" in d.files else "legacy"
+                return unpack({k: d[k] for k in d.files if k not in ("fp", "run_id")})
         rc = self.cfg["retrieval"]
         topn = int(self.cfg["rerank"]["fine_topn"])
+        self._reset_stats(all_stages=True)  # results of earlier runs with other settings no longer apply
         LOG.info("Stage 5a: detailed comparison (mid level) of up to %d diversified candidates per target.",
                  int(rc["candidates"]))
         prog = Progress(total=self.T, desc="Detailed comparison", unit="targets")
@@ -336,7 +354,8 @@ class Matcher:
                 pool_add(p, self.db_n[r], self.db_pts[r], r, ORIGIN_DB, sc)
             pools.append(p)
         self.apply_semantic(pools)
-        atomic_save_npz(path, fp=np.array(fp), **pack(pools))
+        self.stage5_id = os.urandom(8).hex()  # refinement checkpoints are only valid for THIS computation
+        atomic_save_npz(path, fp=np.array(fp), run_id=np.array(self.stage5_id), **pack(pools))
         return pools
 
     # ------------------------------------------------------------------------------------------
@@ -373,7 +392,7 @@ class Matcher:
             r = np.array([x for x in r if int(self.db_n[x]) not in have], np.int64)
             add[int(t)] = self._mid_rank(int(t), r, int(rcfg["extra_fine"]))
         allrows = np.unique(np.concatenate(list(add.values()))) if add else np.zeros(0, np.int64)
-        self.ensure_fine(self.db_n[allrows], self.db_pts[allrows])
+        self.ensure_fine(self.db_n[allrows], self.db_pts[allrows], stage="s7")
         for t, r in add.items():
             r = np.array([x for x in r if int(self.db_n[x]) in self.store], np.int64)
             if len(r):
@@ -452,6 +471,8 @@ class Matcher:
                     ns = n0 + np.round((pts - w["start"]) * self.fps).astype(np.int64)
                 self.stats["dense_frames_decoded"] += len(pts)
                 self.stats["dense_windows"] += 1
+                pos = np.clip(np.searchsorted(self.db_n, ns), 0, len(self.db_n) - 1)
+                db_rows = np.where(self.db_n[pos] == ns, pos, -1)  # database row, or -1 if the sampler skipped it
                 mids = mid_from_fine(fr)
                 cb = CandBatch(mids, fr)
                 tset = set()
@@ -472,8 +493,7 @@ class Matcher:
                     if keep:
                         for j in keep:
                             new_items[int(ns[cand[j]])] = (float(pts[cand[j]]), fr[cand[j]])
-                        added += pool_add(pools[t], ns[cand], pts[cand], np.full(len(cand), -1), ORIGIN_DENSE, sc,
-                                          sel=keep)
+                        added += pool_add(pools[t], ns[cand], pts[cand], db_rows[cand], ORIGIN_DENSE, sc, sel=keep)
                     self.stats["dense_frames_scored"] += len(cand)
                 self.store.add_many([(n, p, f) for n, (p, f) in new_items.items()])
         prog.close()
@@ -486,21 +506,31 @@ class Matcher:
         sel = self.stage_optimise(pools)
         LOG.info("Stage 6: mean similarity %.4f (per-frame best %.4f).", sel["mean_total"], sel["mean_best"])
         rcfg = self.cfg["refine"]
-        fp = self._fp({"retrieval": self.cfg["retrieval"], "rerank": self.cfg["rerank"], "refine": rcfg,
-                       "temporal": self.cfg["temporal"], "sem": self.sem_status})
+        public = {k: v for k, v in rcfg.items() if not k.startswith("_")}  # "_..." keys: test hooks only
+        fp = self._fp({"retrieval": self.cfg["retrieval"], "rerank": self.cfg["rerank"], "refine": public,
+                       "temporal": self.cfg["temporal"], "sem": self.sem_status, "stage5": self.stage5_id})
         prog_path = self.dir / "refine_progress.json"
         state = read_json(prog_path, {}) or {}
         start_round = 0
+        finished = False
         history = [{"round": 0, "mean_total": sel["mean_total"], "mean_best": sel["mean_best"]}]
-        if state.get("fp") == fp and state.get("rounds_done", 0) > 0:
+        if state.get("fp") == fp and state.get("rounds_done", 0) > 0 and state.get("stats"):
             k = int(state["rounds_done"])
             d = np.load(self.dir / f"pools_round{k}.npz")
             pools = unpack({kk: d[kk] for kk in d.files if kk != "fp"})
+            # restore the bookkeeping exactly as it was when round k was saved (work done after that
+            # point -- e.g. windows of an interrupted round -- is redone)
+            self.stats = dict(state["stats"])
+            self.dense_done = [tuple(x) for x in self.stats.get("dense_intervals", [])]
             sel = self.stage_optimise(pools)
             start_round = k
+            finished = bool(state.get("finished"))
             history = state.get("history", history)
-            LOG.info("Stage 7: resuming after refinement round %d (mean similarity %.4f).", k, sel["mean_total"])
-        for rnd in range(start_round, int(rcfg["rounds"])):
+            LOG.info("Stage 7: %s after refinement round %d (mean similarity %.4f).",
+                     "already finished" if finished else "resuming", k, sel["mean_total"])
+        elif int(rcfg["rounds"]) > 0:
+            self._reset_stats(all_stages=False)  # refinement starts from round 0 for these pools
+        for rnd in range(start_round, 0 if finished else int(rcfg["rounds"])):
             t0 = time.time()
             before = sel["mean_total"]
             if rnd == 0:
@@ -515,10 +545,15 @@ class Matcher:
                             "dense_candidates_added": added, "seconds": time.time() - t0})
             LOG.info("Stage 7 round %d: mean similarity %.4f -> %.4f (gain %+.4f).", rnd + 1, before,
                      sel["mean_total"], gain)
+            stop = gain < float(rcfg["min_gain"]) and rnd > 0
             atomic_save_npz(self.dir / f"pools_round{rnd + 1}.npz", fp=np.array(fp), **pack(pools))
-            atomic_write_json(prog_path, {"fp": fp, "rounds_done": rnd + 1, "history": history})
             self._save_stats()
-            if gain < float(rcfg["min_gain"]) and rnd > 0:
+            atomic_write_json(prog_path, {"fp": fp, "rounds_done": rnd + 1, "history": history,
+                                          "finished": stop or rnd + 1 >= int(rcfg["rounds"]),
+                                          "stats": dict(self.stats)})
+            if rcfg.get("_stop_after_round") == rnd + 1:  # self-test: simulate an interruption here
+                raise KeyboardInterrupt(f"test interruption after refinement round {rnd + 1}")
+            if stop:
                 LOG.info("Stage 7: gain below %.4f, stopping refinement.", float(rcfg["min_gain"]))
                 break
         self.stats["refine_history"] = history

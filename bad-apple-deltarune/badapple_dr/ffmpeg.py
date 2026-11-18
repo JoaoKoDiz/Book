@@ -359,10 +359,10 @@ class FrameReader:
                                      stdin=subprocess.DEVNULL, creationflags=_NO_WINDOW, bufsize=1 << 20)
         self._pts: "queue.Queue[float | None]" = queue.Queue()
         self._tail: deque = deque(maxlen=40)
-        self._t = threading.Thread(target=self._read_stderr, daemon=True)
-        self._t.start()
         self.count = 0
         self._closed = False
+        self._t = threading.Thread(target=self._read_stderr, daemon=True)
+        self._t.start()
 
     def _read_stderr(self):
         # Timestamps are computed exactly as integer pts x filter time base (the printed pts_time may
@@ -387,6 +387,9 @@ class FrameReader:
                         tb_num = tb_den = None
                     continue
                 self._tail.append(line.decode("utf-8", "replace").rstrip())
+        except (ValueError, OSError):
+            if not self._closed:  # a read error after close() is expected; anything else is real
+                raise
         finally:
             self._pts.put(None)
 
@@ -447,6 +450,8 @@ class FrameReader:
             self.proc.wait(timeout=10)
         except Exception:
             pass
+        # let the timestamp thread drain stderr to EOF before the pipes are closed (no race)
+        self._t.join(timeout=10)
         for s in (self.proc.stdout, self.proc.stderr):
             try:
                 s.close()  # type: ignore[union-attr]

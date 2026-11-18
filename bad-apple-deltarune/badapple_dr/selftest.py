@@ -394,6 +394,8 @@ def main(work_dir: str = "selftest_work", semantic_test: bool = False) -> int:
         truth_path.write_text(json.dumps(truth, indent=1))
     truth = json.loads(truth_path.read_text())
     LOG.info("Fixtures ready (%.1fs): library %.1f s / %d frames.", time.time() - t0, truth["duration"], truth["frames"])
+    for old in ("run_main", "run_resume", "run_hq", "run_sem", "run_irq", "run_size"):  # always test a full computation
+        shutil.rmtree(work / old, ignore_errors=True)
 
     from .pipeline import run
 
@@ -472,6 +474,10 @@ def main(work_dir: str = "selftest_work", semantic_test: bool = False) -> int:
           f"{acc:.3f} per segment={ {k: f'{a}/{b}' for k, (a, b) in per_label.items()} }")
     check("never selects a decoy (same brightness / mirrored / inverted)", decoy_hits == 0, f"{decoy_hits} decoy frames")
     check("black reference frames matched by dark frames", black_ok)
+    sf = rep["source_frames"]
+    check("refinement decoded frames densely and compared them", (sf.get("decoded_densely_in_refinement") or 0) > 0
+          and (sf.get("compared_at_fine_level") or 0) > 0,
+          f"dense {sf.get('decoded_densely_in_refinement')}, fine-level {sf.get('compared_at_fine_level')}")
     base = baselines(work / "run_main", truth)
     check("brightness-only baseline is clearly worse (sanity of the test)", base["brightness_only"] < acc - 0.3,
           f"brightness-only {base['brightness_only']:.3f}, tone16-L2 {base['tone16_l2']:.3f}, full {acc:.3f}")
@@ -493,12 +499,31 @@ def main(work_dir: str = "selftest_work", semantic_test: bool = False) -> int:
           f"rows {len(a.meta)} vs {len(b.meta)}, decoded {sa['decoded']} vs {sb['decoded']} (truth {truth['frames']})")
     a.close()
     b.close()
-    # 3) second run of the same command must reuse everything
+    # 3) second run of the same command must reuse everything and reproduce the same selection
+    first_sel = [(r["source_frame_index"], r["total_similarity"]) for r in rows]
     t = time.time()
     run(cfg_for("run_main"))
     dt = time.time() - t
     timings["rerun_cached_s"] = dt
-    check("re-running reuses checkpoints", dt < max(60.0, 0.5 * timings["full_pipeline_s"]), f"{dt:.1f}s")
+    again = [(r["source_frame_index"], r["total_similarity"]) for r in _csv(out / "frame_mapping.csv")]
+    check("re-running reuses checkpoints and reproduces the selection", dt < max(60.0, 0.5 * timings["full_pipeline_s"])
+          and again == first_sel, f"{dt:.1f}s, identical={again == first_sel}")
+    # 3b) refinement interrupted after round 1 must resume to exactly the same result
+    t = time.time()
+    shutil.rmtree(work / "run_irq", ignore_errors=True)
+    shutil.copytree(work / "run_main", work / "run_irq", ignore=shutil.ignore_patterns("output", "match", "fine_cache"))
+    icfg = cfg_for("run_irq")
+    icfg["refine"]["_stop_after_round"] = 1
+    try:
+        run(icfg)
+        interrupted = False
+    except KeyboardInterrupt:
+        interrupted = True
+    run(cfg_for("run_irq"))
+    timings["refine_resume_test_s"] = time.time() - t
+    resumed = [(r["source_frame_index"], r["total_similarity"]) for r in _csv(work / "run_irq" / "output" / "frame_mapping.csv")]
+    check("refinement interrupted after round 1 resumes to the identical result", interrupted and resumed == first_sel,
+          f"interrupted={interrupted}, identical={resumed == first_sel}")
     # 4) export from a second rendition (720p H.264 copy)
     t = time.time()
     shutil.rmtree(work / "run_hq", ignore_errors=True)

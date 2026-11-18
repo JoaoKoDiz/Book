@@ -56,6 +56,10 @@
       "pass": true,
       "detail": ""
     },
+    "refinement decoded frames densely and compared them": {
+      "pass": true,
+      "detail": "dense 2337, fine-level 856"
+    },
     "brightness-only baseline is clearly worse (sanity of the test)": {
       "pass": true,
       "detail": "brightness-only 0.116, tone16-L2 0.958, full 1.000"
@@ -64,20 +68,29 @@
       "pass": true,
       "detail": "rows 1777 vs 1777, decoded 6727 vs 6727 (truth 6727)"
     },
-    "re-running reuses checkpoints": {
+    "re-running reuses checkpoints and reproduces the selection": {
       "pass": true,
-      "detail": "12.7s"
+      "detail": "11.7s, identical=True"
+    },
+    "refinement interrupted after round 1 resumes to the identical result": {
+      "pass": true,
+      "detail": "interrupted=True, identical=True"
     },
     "export from 720p rendition: size + frame match": {
       "pass": true,
       "detail": "1280x720, max cross-rendition MAD 3.13"
+    },
+    "semantic code path runs (random weights)": {
+      "pass": true,
+      "detail": "240 values"
     }
   },
   "timings": {
-    "full_pipeline_s": 130.14754843711853,
-    "resume_test_s": 14.306062936782837,
-    "rerun_cached_s": 12.749306678771973,
-    "export_rendition_s": 30.32631754875183
+    "full_pipeline_s": 116.07101011276245,
+    "resume_test_s": 12.879418849945068,
+    "rerun_cached_s": 11.700825452804565,
+    "refine_resume_test_s": 103.99292731285095,
+    "export_rendition_s": 28.22496199607849
   },
   "accuracy_full": 1.0,
   "baselines": {
@@ -143,9 +156,10 @@
   "database": {
     "decoded_and_analysed_in_full_pass": 6727,
     "stored_in_search_database": 1777,
+    "compared_at_fine_level": 856,
     "re_decoded_for_fine_comparison": 650,
     "decoded_densely_in_refinement": 2337,
-    "total_source_frames_compared_in_detail": 26762
+    "dense_frame_target_pairs_scored": 26112
   },
   "mean_similarity": 0.8423888698220253
 }

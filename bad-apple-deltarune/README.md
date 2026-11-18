@@ -221,7 +221,9 @@ index would lose candidates for no speed benefit.
   index and timestamp; **source frame index**, **source timestamp** (seconds and `HH:MM:SS.mmm`) and
   chapter; total, composition, structural, semantic (empty if not computed) and temporal-coherence
   scores; the individual measures (tone, balance, SSIM, ZNCC, IoU, chamfer, orientation); how the
-  frame was found; the export timestamp; and two verification values:
+  frame was found (`database search`, `second-chance search`, `dense refinement`); `in_database`
+  (0 = a frame the adaptive sampler had skipped, recovered by dense refinement); the export
+  timestamp; and two verification values:
   * `trace_mad`: re-decoding the exported timestamp through the analysis path reproduces the analysed
     image; 0 means identical.
   * `output_mad`: the final MP4's frame vs the analysed image; small values come from H.264

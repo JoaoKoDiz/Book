@@ -1,5 +1,5 @@
-output_frame_index,output_timestamp_s,reference_frame_index,reference_timestamp_s,source_frame_index,source_timestamp_s,source_timecode,source_chapter,total_similarity,composition_similarity,structural_similarity,semantic_similarity,temporal_coherence,tone_layout,balance,ssim_mid,zncc,figure_ground_iou_mid,contour_chamfer_mid,gradient_orientation,ssim_fine,figure_ground_iou_fine,contour_chamfer_fine,uniform_reference_frame,found_by,export_timestamp_s,trace_mad,output_mad
-0,0.000000,0,0.000000,1966,65.533000,00:01:05.533,,1.00000,1.00000,1.00000,,1.00000,1.00000,1.00000,,,,,,,,,1,database,65.533000,0.000,0.000
-1,0.041667,1,0.042000,1966,65.533000,00:01:05.533,,1.00000,1.00000,1.00000,,1.00000,1.00000,1.00000,,,,,,,,,1,database,65.533000,0.000,0.000
-2,0.083333,2,0.083000,1966,65.533000,00:01:05.533,,1.00000,1.00000,1.00000,,1.00000,1.00000,1.00000,,,,,,,,,1,database,65.533000,0.000,0.000
-3,0.125000,3,0.125000,1966,65.533000,00:01:05.533,,1.00000,1.00000,1.00000,,1.00000,1.00000,1.00000,,,,,,,,,1,database,65.533000,0.000,0.000
+output_frame_index,output_timestamp_s,reference_frame_index,reference_timestamp_s,source_frame_index,source_timestamp_s,source_timecode,source_chapter,total_similarity,composition_similarity,structural_similarity,semantic_similarity,temporal_coherence,tone_layout,balance,ssim_mid,zncc,figure_ground_iou_mid,contour_chamfer_mid,gradient_orientation,ssim_fine,figure_ground_iou_fine,contour_chamfer_fine,uniform_reference_frame,found_by,in_database,export_timestamp_s,trace_mad,output_mad
+0,0.000000,0,0.000000,1966,65.533000,00:01:05.533,,1.00000,1.00000,1.00000,,1.00000,1.00000,1.00000,,,,,,,,,1,database search,1,65.533000,0.000,0.000
+1,0.041667,1,0.042000,1966,65.533000,00:01:05.533,,1.00000,1.00000,1.00000,,1.00000,1.00000,1.00000,,,,,,,,,1,database search,1,65.533000,0.000,0.000
+2,0.083333,2,0.083000,1966,65.533000,00:01:05.533,,1.00000,1.00000,1.00000,,1.00000,1.00000,1.00000,,,,,,,,,1,database search,1,65.533000,0.000,0.000
+3,0.125000,3,0.125000,1966,65.533000,00:01:05.533,,1.00000,1.00000,1.00000,,1.00000,1.00000,1.00000,,,,,,,,,1,database search,1,65.533000,0.000,0.000

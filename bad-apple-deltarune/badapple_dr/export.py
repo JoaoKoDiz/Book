@@ -245,8 +245,8 @@ def export_all(ffmpeg: str, ffprobe: str | None, cfg: dict, probe_info: dict, db
                      "total_similarity", "composition_similarity", "structural_similarity", "semantic_similarity",
                      "temporal_coherence", "tone_layout", "balance", "ssim_mid", "zncc", "figure_ground_iou_mid",
                      "contour_chamfer_mid", "gradient_orientation", "ssim_fine", "figure_ground_iou_fine",
-                     "contour_chamfer_fine", "uniform_reference_frame", "found_by", "export_timestamp_s",
-                     "trace_mad", "output_mad"])
+                     "contour_chamfer_fine", "uniform_reference_frame", "found_by", "in_database",
+                     "export_timestamp_s", "trace_mad", "output_mad"])
         for t in range(T):
             c = chosen[t]
             p = float(c["pts"])
@@ -263,7 +263,7 @@ def export_all(ffmpeg: str, ffprobe: str | None, cfg: dict, probe_info: dict, db
                          f"{float(sel['coherence'][t]):.5f}", g("tone"), g("balance"), g("ssim_mid"), g("zncc"),
                          g("biou_mid"), g("chamfer_mid"), g("hog"), g("ssim_fine"), g("biou_fine"), g("chamfer_fine"),
                          int(bool(matcher.ts.uniform[t])), ORIGIN_NAMES.get(int(c["origin"]), "?"),
-                         f"{tr['export_pts'] - exp_start:.6f}", f"{tr['mad']:.3f}",
+                         int(int(c["row"]) >= 0), f"{tr['export_pts'] - exp_start:.6f}", f"{tr['mad']:.3f}",
                          "" if verify["per_frame_mad"] is None else f"{verify['per_frame_mad'][t]:.3f}"])
     # ------------------------------------------------------------------ contact sheet
     try:
@@ -366,8 +366,9 @@ def verify_output(ffmpeg, ffprobe, final: Path, chosen, matcher, exp, T, fps_ref
         out["frames_identical_to_selected_source_frames"] = okc
         out["per_frame_mad_mean"] = float(np.nanmean(per))
         out["per_frame_mad_max"] = float(np.nanmax(per))
-    else:
-        out["decoded_output_frames"] = None
+    else:  # resized output: frame identity cannot be compared pixel-wise, but the frame count can
+        with FrameReader(ffmpeg, str(final), pix_fmt="gray", size=(16, 16)) as rd:
+            out["decoded_output_frames"] = sum(1 for _ in rd)
     out["per_frame_mad"] = per
     out["expected_frames"] = T
     out["frame_count_ok"] = (out["decoded_output_frames"] == T) if out["decoded_output_frames"] is not None else None
@@ -417,9 +418,10 @@ def build_report(cfg, probe_info, db, ref_meta, pools, sel, chosen, matcher, ver
         "source_frames": {
             "decoded_and_analysed_in_full_pass": dbr["frames_decoded_and_analysed"],
             "stored_in_search_database": dbr["frames_in_database"],
-            "re_decoded_for_fine_comparison": st.get("fine_fetched"),
+            "compared_at_fine_level": int(st.get("fine_compared_s5", 0) + st.get("fine_compared_s7", 0)),
+            "re_decoded_for_fine_comparison": int(st.get("fine_fetched_s5", 0) + st.get("fine_fetched_s7", 0)),
             "decoded_densely_in_refinement": st.get("dense_frames_decoded"),
-            "total_source_frames_compared_in_detail": int(st.get("fine_fetched", 0) + st.get("dense_frames_scored", 0)),
+            "dense_frame_target_pairs_scored": st.get("dense_frames_scored"),
         },
         "unique_source_frames_selected": uniq,
         "selected_source_span_s": span,
