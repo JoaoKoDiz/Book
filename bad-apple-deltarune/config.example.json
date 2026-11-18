@@ -1,0 +1,98 @@
+{
+  "_comment": "Copy to my_config.json, edit, and pass with --config my_config.json. Any key may be omitted (defaults apply). Paths can also be given on the command line.",
+  "analysis": {
+    "mid_width": 64,
+    "fine_scale": 2,
+    "active_area_samples": 90,
+    "source_crop": null,
+    "reference_crop": null
+  },
+  "index": {
+    "keep_threshold": 0.01,
+    "max_gap": 1.0,
+    "cut_threshold": 0.12,
+    "cut_window": 3,
+    "dup_limit": 3,
+    "threads": 0,
+    "hwaccel": "none",
+    "commit_frames": 6000,
+    "commit_seconds": 30.0
+  },
+  "retrieval": {
+    "coarse_topk": 6000,
+    "candidates": 400,
+    "nms_window": 0.5,
+    "max_per_window": 3,
+    "chunk": 4096
+  },
+  "rerank": {
+    "fine_topn": 32,
+    "workers": 4
+  },
+  "temporal": {
+    "lambda_rhythm": 0.3,
+    "lambda_jump": 0.03,
+    "max_drop": 0.04,
+    "scene_seconds": 3.0,
+    "ref_cut": 0.25
+  },
+  "refine": {
+    "rounds": 2,
+    "window": 1.0,
+    "per_target": 4,
+    "neighbours": 2,
+    "prefilter": 24,
+    "worst_fraction": 0.25,
+    "extra_candidates": 1500,
+    "extra_fine": 64,
+    "max_frames_per_round": 150000,
+    "min_gain": 0.0005
+  },
+  "semantic": {
+    "mode": "auto",
+    "model": "facebook/dinov2-small",
+    "device": "auto",
+    "batch": 32,
+    "image_width": 224
+  },
+  "weights": {
+    "composition": 0.5,
+    "structural": 0.4,
+    "semantic": 0.1,
+    "composition_parts": {
+      "tone": 0.7,
+      "balance": 0.3
+    },
+    "tone_levels": [
+      0.25,
+      0.3,
+      0.25,
+      0.2
+    ],
+    "structural_parts": {
+      "ssim_mid": 0.2,
+      "zncc": 0.15,
+      "biou_mid": 0.2,
+      "chamfer_mid": 0.15,
+      "hog": 0.1,
+      "ssim_fine": 0.05,
+      "biou_fine": 0.05,
+      "chamfer_fine": 0.1
+    },
+    "coarse": {
+      "tone16": 0.3,
+      "tone32": 0.2,
+      "zncc32": 0.25,
+      "dice32": 0.25
+    },
+    "uniform_std": 0.04
+  },
+  "export": {
+    "output_size": "source",
+    "crf": 14,
+    "preset": "slow",
+    "audio_bitrate": "192k",
+    "comparison_height": 360,
+    "lossless": false
+  }
+}

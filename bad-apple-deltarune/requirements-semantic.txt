@@ -1,0 +1,8 @@
+# OPTIONAL semantic similarity (DINOv2 / CLIP feature extraction - never image generation).
+# CPU version (works everywhere):
+#     pip install -r requirements-semantic.txt
+# NVIDIA GPU version: install torch first from the CUDA index, e.g.
+#     pip install torch --index-url https://download.pytorch.org/whl/cu124
+#     pip install -r requirements-semantic.txt
+torch>=2.1
+transformers>=4.40

@@ -1,0 +1,151 @@
+{
+  "checks": {
+    "output files exist": {
+      "pass": true,
+      "detail": ""
+    },
+    "240 reference frames (10 s @ 24 fps)": {
+      "pass": true,
+      "detail": "240"
+    },
+    "CSV has one row per output frame": {
+      "pass": true,
+      "detail": "240"
+    },
+    "output decodes to exactly 240 frames": {
+      "pass": true,
+      "detail": "240"
+    },
+    "output duration is 10.000 s": {
+      "pass": true,
+      "detail": "10.0"
+    },
+    "output frame rate equals reference (24/1)": {
+      "pass": true,
+      "detail": "24/1"
+    },
+    "audio track present, 10 s": {
+      "pass": true,
+      "detail": "10.0"
+    },
+    "audio offset vs reference within 2 ms": {
+      "pass": true,
+      "detail": "0.0 ms"
+    },
+    "beeps at the right times (sync) and none after 10 s": {
+      "pass": true,
+      "detail": "onsets=[np.float64(0.498), np.float64(1.998), np.float64(3.998), np.float64(5.998), np.float64(7.998), np.float64(9.498)]"
+    },
+    "every output frame equals its selected source frame": {
+      "pass": true,
+      "detail": "identical=240 max MAD=0.3666178385416667"
+    },
+    "timestamps re-decode to the analysed frames exactly": {
+      "pass": true,
+      "detail": "max trace MAD 0.0"
+    },
+    "selects the planted matching segment for >= 90% of frames": {
+      "pass": true,
+      "detail": "1.000 per segment={'disk': '48/48', 'figure': '48/48', 'inverse': '48/48', 'blobs': '36/36', 'band': '36/36'}"
+    },
+    "never selects a decoy (same brightness / mirrored / inverted)": {
+      "pass": true,
+      "detail": "0 decoy frames"
+    },
+    "black reference frames matched by dark frames": {
+      "pass": true,
+      "detail": ""
+    },
+    "brightness-only baseline is clearly worse (sanity of the test)": {
+      "pass": true,
+      "detail": "brightness-only 0.116, tone16-L2 0.958, full 1.000"
+    },
+    "resumed index == uninterrupted index": {
+      "pass": true,
+      "detail": "rows 1777 vs 1777, decoded 6727 vs 6727 (truth 6727)"
+    },
+    "re-running reuses checkpoints": {
+      "pass": true,
+      "detail": "12.7s"
+    },
+    "export from 720p rendition: size + frame match": {
+      "pass": true,
+      "detail": "1280x720, max cross-rendition MAD 3.13"
+    }
+  },
+  "timings": {
+    "full_pipeline_s": 130.14754843711853,
+    "resume_test_s": 14.306062936782837,
+    "rerun_cached_s": 12.749306678771973,
+    "export_rendition_s": 30.32631754875183
+  },
+  "accuracy_full": 1.0,
+  "baselines": {
+    "brightness_only": 0.11574074074074074,
+    "tone16_l2": 0.9583333333333334
+  },
+  "truth": {
+    "library_frames": 6727,
+    "planted": [
+      {
+        "label": "inverse",
+        "start": 22.3,
+        "end": 24.3
+      },
+      {
+        "label": "disk",
+        "start": 34.46666666666667,
+        "end": 36.46666666666667
+      },
+      {
+        "label": "band",
+        "start": 47.3,
+        "end": 48.8
+      },
+      {
+        "label": "blobs",
+        "start": 55.43333333333333,
+        "end": 56.93333333333333
+      },
+      {
+        "label": "figure",
+        "start": 195.2,
+        "end": 197.2
+      }
+    ],
+    "decoys": [
+      {
+        "kind": "invert",
+        "of": "disk",
+        "start": 27.933333333333334,
+        "end": 29.933333333333334
+      },
+      {
+        "kind": "mirror",
+        "of": "figure",
+        "start": 36.6,
+        "end": 38.6
+      },
+      {
+        "kind": "uniform",
+        "of": 0,
+        "start": 89.9,
+        "end": 93.5
+      },
+      {
+        "kind": "mirror",
+        "of": "blobs",
+        "start": 138.76666666666668,
+        "end": 140.26666666666668
+      }
+    ]
+  },
+  "database": {
+    "decoded_and_analysed_in_full_pass": 6727,
+    "stored_in_search_database": 1777,
+    "re_decoded_for_fine_comparison": 650,
+    "decoded_densely_in_refinement": 2337,
+    "total_source_frames_compared_in_detail": 26762
+  },
+  "mean_similarity": 0.8423888698220253
+}
