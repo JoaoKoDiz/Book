@@ -251,6 +251,9 @@ above, scaled to 0–1. They are **not** percentages of human-perceived similari
 * `work\match\`: retrieval results, candidate pools after each refinement round, statistics.
 * `work\probe.json`, `work\reference\`, `work\timings.json`, `work\pipeline.log` (full log).
 
+To stop gracefully you can press Ctrl+C, use the GUI's **Stop** button, or create an empty file named
+`STOP` in the work folder. The program then saves its progress and exits; the next start resumes.
+
 Changing settings later only recomputes what depends on them. Matching weights reuse the database;
 index settings require a new database (use a new `--work` folder, or delete `work\db`). The work
 folder can be deleted once you are happy with the result.

@@ -110,8 +110,17 @@ def main() -> None:
     def stop():
         p = state["proc"]
         if p is not None and p.poll() is None:
-            p.terminate()
-            status.set("Stopping... progress is saved.")
+            # graceful: the pipeline sees work/STOP, saves its progress and exits
+            try:
+                Path(vars_["work"].get(), "STOP").write_text("stop")
+            except OSError:
+                p.terminate()
+            status.set("Stopping after saving progress... (start again later to resume)")
+
+            def force():
+                if p.poll() is None:
+                    p.terminate()
+            root.after(60000, force)
 
     def poll():
         try:

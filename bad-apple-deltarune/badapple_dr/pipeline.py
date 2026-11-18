@@ -10,7 +10,8 @@ from .ffmpeg import ffmpeg_version, find_ffmpeg, find_ffprobe
 from .index import SourceDB, build_index
 from .probe import analysis_canvas, inspect_file
 from .reference import extract_reference, load_reference
-from .util import LOG, StageTimer, atomic_write_json, file_identity, fingerprint, read_json, setup_logging
+from .util import (LOG, StageTimer, atomic_write_json, file_identity, fingerprint, read_json, set_stop_file,
+                   setup_logging)
 
 STAGES = ("probe", "index", "reference", "match", "export")
 
@@ -78,6 +79,7 @@ def run(cfg: dict, until: str = "export", stop_after_frames: int | None = None, 
     out = Path(cfg["out_dir"]).resolve()
     work.mkdir(parents=True, exist_ok=True)
     setup_logging(work, verbose)
+    set_stop_file(work)
     _check_inputs(cfg)
     save_config(cfg, work / "config.json")
     ffmpeg = find_ffmpeg(cfg.get("ffmpeg") or None)

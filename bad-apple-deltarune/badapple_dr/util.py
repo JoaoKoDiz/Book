@@ -199,6 +199,24 @@ class Progress:
             LOG.info(self.status_line())
 
 
+_STOP_FILE: Path | None = None
+
+
+def set_stop_file(work_dir: str | os.PathLike) -> None:
+    """A file named STOP in the work folder asks the pipeline to save its progress and exit."""
+    global _STOP_FILE
+    _STOP_FILE = Path(work_dir) / "STOP"
+    try:
+        _STOP_FILE.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def check_stop() -> None:
+    if _STOP_FILE is not None and _STOP_FILE.exists():
+        raise KeyboardInterrupt("stop requested (STOP file)")
+
+
 class StageTimer:
     """Accumulates wall-clock time per stage across resumed runs (stored in work/timings.json)."""
 

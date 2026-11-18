@@ -30,7 +30,7 @@ import numpy as np
 
 from . import features as F
 from .ffmpeg import FrameReader
-from .util import LOG, Progress, atomic_write_json, fingerprint, read_json
+from .util import LOG, Progress, atomic_write_json, check_stop, fingerprint, read_json
 
 META_DTYPE = np.dtype([
     ("n", "<i8"),        # frame index in the source video (0-based, presentation order)
@@ -298,6 +298,7 @@ def build_index(ffmpeg: str, cfg: dict, src_info: dict, db_dir: str | os.PathLik
             if stop_after_frames is not None and decoded >= stop_after_frames:
                 LOG.info("Stopping early after %s frames (requested).", f"{decoded:,}")
                 break
+            check_stop()
     except KeyboardInterrupt:
         LOG.warning("Interrupted -- saving progress (resume later with the same command).")
         commit(final=False)

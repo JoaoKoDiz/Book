@@ -32,7 +32,7 @@ from .framestore import FrameStore
 from .retrieval import coarse_scores, db_descriptors, diversify, retrieve, target_descriptors
 from .scoring import STRUCT_KEYS, CandBatch, TargetSet, combine_total, score
 from .temporal import optimise
-from .util import LOG, Progress, atomic_save_npz, atomic_write_json, fingerprint, read_json
+from .util import LOG, Progress, atomic_save_npz, atomic_write_json, check_stop, fingerprint, read_json
 
 SCORE_KEYS = ("total", "composition", "structural", "semantic", "tone", "balance") + STRUCT_KEYS
 ORIGIN_DB, ORIGIN_SECOND, ORIGIN_DENSE = 0, 1, 2
@@ -280,6 +280,7 @@ class Matcher:
             self.store.add_many(items)
             self.stats[f"fine_fetched_{stage}"] += len(items)
             self._save_stats()
+            check_stop()
         prog.close()
         if self.stats["fetch_missing"]:
             LOG.warning("%d candidate frames could not be re-decoded at their exact timestamp and were dropped.",
@@ -340,6 +341,7 @@ class Matcher:
                              int(rc["max_per_window"]))
             ranked.append(self._mid_rank(t, r, topn))
             prog.update(1)
+            check_stop()
         prog.close()
         allrows = np.unique(np.concatenate(ranked)) if ranked else np.zeros(0, np.int64)
         LOG.info("Stage 5b: %s unique finalists -> re-decoding them from the video at %dx%d.",
@@ -460,6 +462,7 @@ class Matcher:
         with ThreadPoolExecutor(max_workers=self.workers) as ex:
             for w, pts, fr in ex.map(decode, todo):
                 prog.update(1)
+                check_stop()
                 self.dense_done.append((w["start"], w["b"]))
                 if fr is None or len(pts) == 0:
                     continue
